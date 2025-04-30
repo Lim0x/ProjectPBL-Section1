@@ -1,7 +1,11 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\antek\\source\\repos\\Lim0x\\ProjectPBL-Section1\\WirtualnyBank-vs\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1B4E5E98-7DE8-4771-9772-435C153800C6}|WirtualnyBank.vcxproj|C:\\Users\\antek\\source\\repos\\Lim0x\\ProjectPBL-Section1\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +13,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -26,6 +30,19 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\antek\\source\\repos\\Lim0x\\ProjectPBL-Section1\\main.cpp",
+              "RelativeDocumentMoniker": "..\\main.cpp",
+              "ToolTip": "C:\\Users\\antek\\source\\repos\\Lim0x\\ProjectPBL-Section1\\main.cpp",
+              "RelativeToolTip": "..\\main.cpp",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABQAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-04-30T21:28:20.882Z",
+              "EditorCaption": ""
             }
           ]
         }
