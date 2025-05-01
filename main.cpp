@@ -8,7 +8,8 @@ using namespace std;
 using namespace std;
 using json = nlohmann::json;
 
-
+// Forward declarations
+class Klient;
 /**
  * @class Konto
  * @brief Reprezentuje konto.
@@ -59,7 +60,32 @@ class Karta{
 		void setTypKarty(string typ) { typKarty = typ; } ///< Ustala typ karty (np. Debitowa, Kredytowa)
 		void setSaldoKarty(float saldo) { saldoKarty = saldo; } ///< Ustala saldo karty (jezli dotyczy)
 	};
-class Lokata{}; //tymczasowo tutaj zeby kompilator dzialal
+
+/**
+ * @class Lokata
+ * @brief Reprezentuje lokate.
+ *
+ * Klasa przechowuje kwote, oprocentowanie, date oddania oraz odnosenie do wlasciciela.
+ */
+class Lokata {
+	double kwota; ///< Kwota
+	double oprocentowanie; ///< Oprocentowanie
+	string dataOddania; ///< Data oddania
+	Klient* wlasciciel; ///< Wlasciciel
+
+public:
+	Lokata(double kwota, double oprocentowanie, const string& dataOddania, Klient* wlasciciel) {
+		this->kwota = kwota;
+		this->oprocentowanie = oprocentowanie;
+		this->dataOddania = dataOddania;
+		this->wlasciciel = wlasciciel;
+	}
+
+	double getKwota() const { return kwota; }
+	double getOprocentowanie() const { return oprocentowanie; }
+	const string& getDataOddania() const { return dataOddania; }
+	Klient* getWlasciciel() const { return wlasciciel; }
+};
 
 
 /**
