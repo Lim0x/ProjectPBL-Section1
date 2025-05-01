@@ -11,6 +11,13 @@ using json = nlohmann::json;
 
 
 class Konto{};
+/**
+ * @class Karta
+ * @brief Reprezentuje karte.
+ * 
+ * 
+ *  Klasa przechowuje podtsawowe dane dane i funkcje zwi�zane z kartami 
+ */
 class Karta{
 	private:
 		string numerKarty; ///< Numer karty
