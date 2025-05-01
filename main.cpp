@@ -9,8 +9,29 @@ using namespace std;
 using json = nlohmann::json;
 
 
-
-class Konto{};
+/**
+ * @class Konto
+ * @brief Reprezentuje konto.
+ * 
+ * 
+ *  Klasa przechowuje podtsawowe dane dane i funkcje zwiazane z kontami 
+ */
+class Konto{
+	private:
+		string numerKonta; ///< Numer konta
+		string typKonta; ///< Typ konta (np. Osobiste, Oszczędnościowe)
+		float saldoKonta; ///< Saldo konta
+		Karta karta; ///< Karta przypisana do konta (jeśli dotyczy)
+		Lokata lokata; ///< Lokata przypisana do konta (jeśli dotyczy)
+	public:
+		string getNumerKonta() const { return numerKonta; } ///< Zwraca numer konta
+		string getTypKonta() const { return typKonta; } ///< Zwraca typ konta (np. Osobiste, Oszczędnościowe)	
+		float getSaldoKonta() const { return saldoKonta; } ///< Zwraca saldo konta
+		void setNumerKonta(string numer) { numerKonta = numer; } ///< Ustala numer konta
+		void setTypKonta(string typ) { typKonta = typ; } ///< Ustala typ konta (np. Osobiste, Oszczędnościowe)
+		void setSaldoKonta(float saldo) { saldoKonta = saldo; } ///< Ustala saldo konta
+	
+};
 /**
  * @class Karta
  * @brief Reprezentuje karte.
