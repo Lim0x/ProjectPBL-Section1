@@ -91,10 +91,33 @@ class Lokata {
 			this->dataOddania = dataOddania;
 			this->wlasciciel = wlasciciel;
 		}
-
+		
+		/**
+		 * @brief Zwraca kwote lokaty.
+		 *
+		 * @return Kwota lokaty
+		 */
 		float getKwota() const { return kwota; }
+		
+		/**
+		 * @brief Zwraca oprocentowanie lokaty.
+		 *
+		 * @return Oprocentowanie lokaty
+		 */
 		float getOprocentowanie() const { return oprocentowanie; }
+
+		/**
+		 * @brief Zwraca date oddania lokaty.
+		 *
+		 * @return Data oddania lokaty
+		 */
 		const string& getDataOddania() const { return dataOddania; }
+
+		/**
+		 * @brief Zwraca wlasciciela lokaty.
+		 *
+		 * @return Wlasciciel lokaty
+		 */
 		Klient* getWlasciciel() const { return wlasciciel; }
 };
 
