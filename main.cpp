@@ -69,23 +69,33 @@ class Karta{
  * Klasa przechowuje kwote, oprocentowanie, date oddania oraz odnosenie do wlasciciela.
  */
 class Lokata {
-	float kwota; ///< Kwota
-	float oprocentowanie; ///< Oprocentowanie
-	string dataOddania; ///< Data oddania
-	Klient* wlasciciel; ///< Wlasciciel
+	float kwota; ///< Kwota lokaty
+	float oprocentowanie; ///< Oprocentowanie lokaty
+	string dataOddania; ///< Data oddania lokaty
+	Klient* wlasciciel; ///< Wlasciciel lokaty
 
-public:
-	Lokata(float kwota, float oprocentowanie, const string& dataOddania, Klient* wlasciciel) {
-		this->kwota = kwota;
-		this->oprocentowanie = oprocentowanie;
-		this->dataOddania = dataOddania;
-		this->wlasciciel = wlasciciel;
-	}
+	public:
+		/**
+		 * @brief Konstruktor klasy Lokata.
+		 *
+		 * Inicjalizuje obiekt Lokata z podanymi parametrami.
+		 *
+		 * @param kwota Kwota lokaty
+		 * @param oprocentowanie Oprocentowanie lokaty
+		 * @param dataOddania Data oddania lokaty
+		 * @param wlasciciel Wlasciciel lokaty
+		 */
+		Lokata(float kwota, float oprocentowanie, const string& dataOddania, Klient* wlasciciel) {
+			this->kwota = kwota;
+			this->oprocentowanie = oprocentowanie;
+			this->dataOddania = dataOddania;
+			this->wlasciciel = wlasciciel;
+		}
 
-	float getKwota() const { return kwota; }
-	float getOprocentowanie() const { return oprocentowanie; }
-	const string& getDataOddania() const { return dataOddania; }
-	Klient* getWlasciciel() const { return wlasciciel; }
+		float getKwota() const { return kwota; }
+		float getOprocentowanie() const { return oprocentowanie; }
+		const string& getDataOddania() const { return dataOddania; }
+		Klient* getWlasciciel() const { return wlasciciel; }
 };
 
 
