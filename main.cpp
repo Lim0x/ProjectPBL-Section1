@@ -10,6 +10,7 @@ using json = nlohmann::json;
 
 // Forward declarations
 class Klient;
+
 /**
  * @class Konto
  * @brief Reprezentuje konto.
@@ -17,7 +18,7 @@ class Klient;
  * 
  *  Klasa przechowuje podtsawowe dane dane i funkcje zwiazane z kontami 
  */
-class Konto{
+class Konto {
 	private:
 		string numerKonta; ///< Numer konta
 		string typKonta; ///< Typ konta (np. Osobiste, Oszczędnościowe)
@@ -31,8 +32,8 @@ class Konto{
 		void setNumerKonta(string numer) { numerKonta = numer; } ///< Ustala numer konta
 		void setTypKonta(string typ) { typKonta = typ; } ///< Ustala typ konta (np. Osobiste, Oszczędnościowe)
 		void setSaldoKonta(float saldo) { saldoKonta = saldo; } ///< Ustala saldo konta
-	
 };
+
 /**
  * @class Karta
  * @brief Reprezentuje karte.
@@ -68,21 +69,21 @@ class Karta{
  * Klasa przechowuje kwote, oprocentowanie, date oddania oraz odnosenie do wlasciciela.
  */
 class Lokata {
-	double kwota; ///< Kwota
-	double oprocentowanie; ///< Oprocentowanie
+	float kwota; ///< Kwota
+	float oprocentowanie; ///< Oprocentowanie
 	string dataOddania; ///< Data oddania
 	Klient* wlasciciel; ///< Wlasciciel
 
 public:
-	Lokata(double kwota, double oprocentowanie, const string& dataOddania, Klient* wlasciciel) {
+	Lokata(float kwota, float oprocentowanie, const string& dataOddania, Klient* wlasciciel) {
 		this->kwota = kwota;
 		this->oprocentowanie = oprocentowanie;
 		this->dataOddania = dataOddania;
 		this->wlasciciel = wlasciciel;
 	}
 
-	double getKwota() const { return kwota; }
-	double getOprocentowanie() const { return oprocentowanie; }
+	float getKwota() const { return kwota; }
+	float getOprocentowanie() const { return oprocentowanie; }
 	const string& getDataOddania() const { return dataOddania; }
 	Klient* getWlasciciel() const { return wlasciciel; }
 };
