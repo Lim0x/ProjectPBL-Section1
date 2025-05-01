@@ -11,7 +11,26 @@ using json = nlohmann::json;
 
 
 class Konto{};
-class Karta{};
+class Karta{
+	private:
+		string numerKarty; ///< Numer karty
+		string dataWaznosci; ///< Data waï¿½noï¿½ci karty
+		string kodCVC; ///< Kod CVC karty
+		string typKarty; ///< Typ karty (np. Debitowa, Kredytowa)
+		float saldoKarty; ///< Saldo karty (jeï¿½li dotyczy)
+	public:
+		///< getters i setters do atrybutow karty
+		string getNumerKarty() const { return numerKarty; }	///< Zwraca numer karty
+		string getDataWaznosci() const { return dataWaznosci; } ///< Zwraca datï¿½ waï¿½noï¿½ci karty
+		string getKodCVC() const { return kodCVC; } ///< Zwraca kod CVC karty
+		string getTypKarty() const { return typKarty; } ///< Zwraca typ karty (np. Debitowa, Kredytowa)
+		float getSaldoKarty() const { return saldoKarty; } ///< Zwraca saldo karty
+		void setNumerKarty(string numer) { numerKarty = numer; } ///< Ustala numer karty
+		void setDataWaznosci(string data) { dataWaznosci = data; } ///< Ustala datï¿½ waï¿½noï¿½ci karty
+		void setKodCVC(string kod) { kodCVC = kod; } ///< Ustala kod CVC karty		
+		void setTypKarty(string typ) { typKarty = typ; } ///< Ustala typ karty (np. Debitowa, Kredytowa)
+		void setSaldoKarty(float saldo) { saldoKarty = saldo; } ///< Ustala saldo karty (jeï¿½li dotyczy)
+	};
 class Lokata{}; //tymczasowo tutaj zeby kompilator dzialal
 
 
@@ -20,71 +39,71 @@ class Lokata{}; //tymczasowo tutaj zeby kompilator dzialal
  * @brief Reprezentuje klienta banku.
  * 
  * 
- *  Klasa przechowuje dane osobowe oraz udostêpnia podstawowe funkcje zwi¹zane z u¿ytkownikiem 
+ *  Klasa przechowuje dane osobowe oraz udostï¿½pnia podstawowe funkcje zwiï¿½zane z uï¿½ytkownikiem 
  */
 class Klient
 {
 private:
-	string imie; ///< Imiê klienta
+	string imie; ///< Imiï¿½ klienta
 	string nazwisko; ///< Nazwisko klienta
 	string pesel; ///< Numer PESEL klienta
 	string login; ///< Login klienta
-	string haslo; ///< Has³o klienta
+	string haslo; ///< Hasï¿½o klienta
 
-	vector<Konto> kontaUzytkownika; ///< Tablica przechowuj¹ca konta u¿ytkownika
-	vector<Karta> kartyUzytkownika; ///< Tablica przechopwuj¹ca karty u¿ytkownika
-	vector<Lokata> lokatyUzytkownika; ///< Tablica przechowuj¹ca lokaty u¿ytkownika
+	vector<Konto> kontaUzytkownika; ///< Tablica przechowujï¿½ca konta uï¿½ytkownika
+	vector<Karta> kartyUzytkownika; ///< Tablica przechopwujï¿½ca karty uï¿½ytkownika
+	vector<Lokata> lokatyUzytkownika; ///< Tablica przechowujï¿½ca lokaty uï¿½ytkownika
 
 	/**
 	 * @brief Rejestruje nowego klienta.
 	 *
-	 * Funckja rejestruje nowego klienta w systemie, zapisuj¹c jego dane do pliku JSON (Imiê, nazwisko, PESEL, login, has³o).
+	 * Funckja rejestruje nowego klienta w systemie, zapisujï¿½c jego dane do pliku JSON (Imiï¿½, nazwisko, PESEL, login, hasï¿½o).
 	 */
 	void rejestracja();
 
 	/**
 	 * @brief Loguje klienta do systemu.
 	 *
-	 * Funkcja loguje klienta do systemu, sprawdzaj¹c poprawnoœæ podanych danych (login, has³o).
+	 * Funkcja loguje klienta do systemu, sprawdzajï¿½c poprawnoï¿½ï¿½ podanych danych (login, hasï¿½o).
 	 */
 	void logowanie();
 
     /**
      * @brief Edytuje dane klienta.
      *
-     * Funkcja umo¿liwia edycjê danych klienta, takich jak imiê, nazwisko, czy PESEL,
-     * zapisuj¹c zmiany do pliku JSON.
+     * Funkcja umoï¿½liwia edycjï¿½ danych klienta, takich jak imiï¿½, nazwisko, czy PESEL,
+     * zapisujï¿½c zmiany do pliku JSON.
      */
     void edytujDane();
 
 	/**
-	* @brief Dodaje nowe konto do listy kont u¿ytkownika.
+	* @brief Dodaje nowe konto do listy kont uï¿½ytkownika.
 	*
-	* Funkcja umo¿liwia dodanie nowego konta do listy kont u¿ytkownika.
+	* Funkcja umoï¿½liwia dodanie nowego konta do listy kont uï¿½ytkownika.
 	* Nowe konto jest przechowywane w wektorze kontaUzytkownika.
 	*/
 	void dodajKonto();
 
 	/**
-	 * @brief Dodaje now¹ kartê do listy kart u¿ytkownika.
+	 * @brief Dodaje nowï¿½ kartï¿½ do listy kart uï¿½ytkownika.
 	 *
-	 * Funkcja umo¿liwia dodanie nowej karty do listy kart u¿ytkownika.
+	 * Funkcja umoï¿½liwia dodanie nowej karty do listy kart uï¿½ytkownika.
 	 * Nowa karta jest przechowywana w wektorze kartyUzytkownika.
 	 */
 	void dodajKarte();
 
 	/**
-	 * @brief Dodaje now¹ lokatê do listy lokat u¿ytkownika.
+	 * @brief Dodaje nowï¿½ lokatï¿½ do listy lokat uï¿½ytkownika.
 	 *
-	 * Funkcja umo¿liwia dodanie nowej lokaty do listy lokat u¿ytkownika.
+	 * Funkcja umoï¿½liwia dodanie nowej lokaty do listy lokat uï¿½ytkownika.
 	 * Nowa lokata jest przechowywana w wektorze lokatyUzytkownika.
 	 */
 	void dodajLokate();
 
 	/**
-	 * @brief Wyœwietla dane klienta.
+	 * @brief Wyï¿½wietla dane klienta.
 	 *
-	 * Funkcja wyœwietla dane klienta, takie jak imiê, nazwisko, PESEL, login i has³o.
+	 * Funkcja wyï¿½wietla dane klienta, takie jak imiï¿½, nazwisko, PESEL, login i hasï¿½o.
 	 */
 	void wyswietlDane();
 };
