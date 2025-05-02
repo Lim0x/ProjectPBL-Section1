@@ -1,15 +1,92 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
-
-using namespace std;
+#include <string>
+#include <vector>
 #include "json.hpp"
 
 using namespace std;
 using json = nlohmann::json;
 
-// Forward declarations
-class Klient;
+
+/**
+ * @class Karta
+ * @brief Reprezentuje karte.
+ *
+ *
+ *  Klasa przechowuje podtsawowe dane dane i funkcje zwiazane z kartami
+ */
+class Karta {
+private:
+	string numerKarty; ///< Numer karty
+	string dataWaznosci; ///< Data waznosci karty
+	string kodCVC; ///< Kod CVC karty
+	string typKarty; ///< Typ karty (np. Debitowa, Kredytowa)
+	float saldoKarty; ///< Saldo karty (jezli dotyczy)
+public:
+	///< getters i setters do atrybutow karty
+	string getNumerKarty() const { return numerKarty; }	///< Zwraca numer karty
+	string getDataWaznosci() const { return dataWaznosci; } ///< Zwraca date waznosci karty
+	string getKodCVC() const { return kodCVC; } ///< Zwraca kod CVC karty
+	string getTypKarty() const { return typKarty; } ///< Zwraca typ karty (np. Debitowa, Kredytowa)
+	float getSaldoKarty() const { return saldoKarty; } ///< Zwraca saldo karty
+	void setNumerKarty(string numer) { numerKarty = numer; } ///< Ustala numer karty
+	void setDataWaznosci(string data) { dataWaznosci = data; } ///< Ustala date waznosci karty
+	void setKodCVC(string kod) { kodCVC = kod; } ///< Ustala kod CVC karty		
+	void setTypKarty(string typ) { typKarty = typ; } ///< Ustala typ karty (np. Debitowa, Kredytowa)
+	void setSaldoKarty(float saldo) { saldoKarty = saldo; } ///< Ustala saldo karty (jezli dotyczy)
+};
+
+
+/**
+ * @class Lokata
+ * @brief Reprezentuje lokate.
+ *
+ * Klasa przechowuje kwote, oprocentowanie, date oddania oraz odnosenie do wlasciciela.
+ */
+class Lokata {
+	float kwota; ///< Kwota lokaty
+	float oprocentowanie; ///< Oprocentowanie lokaty
+	string dataOddania; ///< Data oddania lokaty
+
+public:
+	/**
+	 * @brief Konstruktor klasy Lokata.
+	 *
+	 * Inicjalizuje obiekt Lokata z podanymi parametrami.
+	 *
+	 * @param kwota Kwota lokaty
+	 * @param oprocentowanie Oprocentowanie lokaty
+	 * @param dataOddania Data oddania lokaty
+	 * @param wlasciciel Wlasciciel lokaty
+	 */
+	Lokata(float kwota, float oprocentowanie, const string& dataOddania) {
+		this->kwota = kwota;
+		this->oprocentowanie = oprocentowanie;
+		this->dataOddania = dataOddania;
+	}
+
+	/**
+	 * @brief Zwraca kwote lokaty.
+	 *
+	 * @return Kwota lokaty
+	 */
+	float getKwota() const { return kwota; }
+
+	/**
+	 * @brief Zwraca oprocentowanie lokaty.
+	 *
+	 * @return Oprocentowanie lokaty
+	 */
+	float getOprocentowanie() const { return oprocentowanie; }
+
+	/**
+	 * @brief Zwraca date oddania lokaty.
+	 *
+	 * @return Data oddania lokaty
+	 */
+	const string& getDataOddania() const { return dataOddania; }
+};
 
 /**
  * @class Konto
@@ -23,8 +100,7 @@ class Konto {
 		string numerKonta; ///< Numer konta
 		string typKonta; ///< Typ konta (np. Osobiste, Oszczędnościowe)
 		float saldoKonta; ///< Saldo konta
-		Karta karta; ///< Karta przypisana do konta (jeśli dotyczy)
-		Lokata lokata; ///< Lokata przypisana do konta (jeśli dotyczy)
+
 	public:
 		string getNumerKonta() const { return numerKonta; } ///< Zwraca numer konta
 		string getTypKonta() const { return typKonta; } ///< Zwraca typ konta (np. Osobiste, Oszczędnościowe)	
@@ -32,93 +108,6 @@ class Konto {
 		void setNumerKonta(string numer) { numerKonta = numer; } ///< Ustala numer konta
 		void setTypKonta(string typ) { typKonta = typ; } ///< Ustala typ konta (np. Osobiste, Oszczędnościowe)
 		void setSaldoKonta(float saldo) { saldoKonta = saldo; } ///< Ustala saldo konta
-};
-
-/**
- * @class Karta
- * @brief Reprezentuje karte.
- * 
- * 
- *  Klasa przechowuje podtsawowe dane dane i funkcje zwiazane z kartami 
- */
-class Karta{
-	private:
-		string numerKarty; ///< Numer karty
-		string dataWaznosci; ///< Data waznosci karty
-		string kodCVC; ///< Kod CVC karty
-		string typKarty; ///< Typ karty (np. Debitowa, Kredytowa)
-		float saldoKarty; ///< Saldo karty (jezli dotyczy)
-	public:
-		///< getters i setters do atrybutow karty
-		string getNumerKarty() const { return numerKarty; }	///< Zwraca numer karty
-		string getDataWaznosci() const { return dataWaznosci; } ///< Zwraca date waznosci karty
-		string getKodCVC() const { return kodCVC; } ///< Zwraca kod CVC karty
-		string getTypKarty() const { return typKarty; } ///< Zwraca typ karty (np. Debitowa, Kredytowa)
-		float getSaldoKarty() const { return saldoKarty; } ///< Zwraca saldo karty
-		void setNumerKarty(string numer) { numerKarty = numer; } ///< Ustala numer karty
-		void setDataWaznosci(string data) { dataWaznosci = data; } ///< Ustala date waznosci karty
-		void setKodCVC(string kod) { kodCVC = kod; } ///< Ustala kod CVC karty		
-		void setTypKarty(string typ) { typKarty = typ; } ///< Ustala typ karty (np. Debitowa, Kredytowa)
-		void setSaldoKarty(float saldo) { saldoKarty = saldo; } ///< Ustala saldo karty (jezli dotyczy)
-	};
-
-/**
- * @class Lokata
- * @brief Reprezentuje lokate.
- *
- * Klasa przechowuje kwote, oprocentowanie, date oddania oraz odnosenie do wlasciciela.
- */
-class Lokata {
-	float kwota; ///< Kwota lokaty
-	float oprocentowanie; ///< Oprocentowanie lokaty
-	string dataOddania; ///< Data oddania lokaty
-	Klient* wlasciciel; ///< Wlasciciel lokaty
-
-	public:
-		/**
-		 * @brief Konstruktor klasy Lokata.
-		 *
-		 * Inicjalizuje obiekt Lokata z podanymi parametrami.
-		 *
-		 * @param kwota Kwota lokaty
-		 * @param oprocentowanie Oprocentowanie lokaty
-		 * @param dataOddania Data oddania lokaty
-		 * @param wlasciciel Wlasciciel lokaty
-		 */
-		Lokata(float kwota, float oprocentowanie, const string& dataOddania, Klient* wlasciciel) {
-			this->kwota = kwota;
-			this->oprocentowanie = oprocentowanie;
-			this->dataOddania = dataOddania;
-			this->wlasciciel = wlasciciel;
-		}
-		
-		/**
-		 * @brief Zwraca kwote lokaty.
-		 *
-		 * @return Kwota lokaty
-		 */
-		float getKwota() const { return kwota; }
-		
-		/**
-		 * @brief Zwraca oprocentowanie lokaty.
-		 *
-		 * @return Oprocentowanie lokaty
-		 */
-		float getOprocentowanie() const { return oprocentowanie; }
-
-		/**
-		 * @brief Zwraca date oddania lokaty.
-		 *
-		 * @return Data oddania lokaty
-		 */
-		const string& getDataOddania() const { return dataOddania; }
-
-		/**
-		 * @brief Zwraca wlasciciela lokaty.
-		 *
-		 * @return Wlasciciel lokaty
-		 */
-		Klient* getWlasciciel() const { return wlasciciel; }
 };
 
 
@@ -141,6 +130,8 @@ private:
 	vector<Konto> kontaUzytkownika; ///< Tablica przechowujaca konta uzytkownika
 	vector<Karta> kartyUzytkownika; ///< Tablica przechowujaca karty uzytkownika
 	vector<Lokata> lokatyUzytkownika; ///< Tablica przechowujaca lokaty uzytkownika
+
+public:
 
 	/**
 	 * @brief Rejestruje nowego klienta.
