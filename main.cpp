@@ -24,17 +24,66 @@ private:
 	string typKarty; ///< Typ karty (np. Debitowa, Kredytowa)
 	float saldoKarty; ///< Saldo karty (jezli dotyczy)
 public:
-	///< getters i setters do atrybutow karty
-	string getNumerKarty() const { return numerKarty; }	///< Zwraca numer karty
-	string getDataWaznosci() const { return dataWaznosci; } ///< Zwraca date waznosci karty
-	string getKodCVC() const { return kodCVC; } ///< Zwraca kod CVC karty
-	string getTypKarty() const { return typKarty; } ///< Zwraca typ karty (np. Debitowa, Kredytowa)
-	float getSaldoKarty() const { return saldoKarty; } ///< Zwraca saldo karty
-	void setNumerKarty(string numer) { numerKarty = numer; } ///< Ustala numer karty
-	void setDataWaznosci(string data) { dataWaznosci = data; } ///< Ustala date waznosci karty
-	void setKodCVC(string kod) { kodCVC = kod; } ///< Ustala kod CVC karty		
-	void setTypKarty(string typ) { typKarty = typ; } ///< Ustala typ karty (np. Debitowa, Kredytowa)
-	void setSaldoKarty(float saldo) { saldoKarty = saldo; } ///< Ustala saldo karty (jezli dotyczy)
+	/**
+	 * @brief Zwraca numer karty.
+	 *
+	 * @return Numer karty
+	 */
+	string getNumerKarty() const { return numerKarty; }
+	/**
+	 * @brief Zwraca date waznosci karty.
+	 *
+	 * @return Data waznosci karty
+	 */
+	string getDataWaznosci() const { return dataWaznosci; }
+	/**
+	 * @brief Zwraca kod CVC karty.
+	 *
+	 * @return Kod CVC karty
+	 */
+	string getKodCVC() const { return kodCVC; }
+	/**
+	 * @brief Zwraca typ karty.
+	 *
+	 * @return Typ karty (np. Debitowa, Kredytowa)
+	 */
+	string getTypKarty() const { return typKarty; }
+	/**
+	 * @brief Zwraca saldo karty.
+	 *
+	 * @return Saldo karty (jezli dotyczy)
+	 */
+	float getSaldoKarty() const { return saldoKarty; }
+	/**
+	 * @brief Ustala numer karty.
+	 *
+	 * @param numer Numer karty
+	 */
+	void setNumerKarty(string numer) { numerKarty = numer; }
+	/**
+	 * @brief Ustala date waznosci karty.
+	 *
+	 * @param data Data waznosci karty
+	 */
+	void setDataWaznosci(string data) { dataWaznosci = data; }
+	/**
+	 * @brief Ustala kod CVC karty.
+	 *
+	 * @param kod Kod CVC karty
+	 */
+	void setKodCVC(string kod) { kodCVC = kod; }
+	/**
+	 * @brief Ustala typ karty.
+	 *
+	 * @param typ Typ karty (np. Debitowa, Kredytowa)
+	 */
+	void setTypKarty(string typ) { typKarty = typ; }
+	/**
+	 * @brief Ustala saldo karty.
+	 *
+	 * @param saldo Saldo karty
+	 */
+	void setSaldoKarty(float saldo) { saldoKarty = saldo; }
 };
 
 
@@ -102,12 +151,42 @@ class Konto {
 		float saldoKonta; ///< Saldo konta
 
 	public:
-		string getNumerKonta() const { return numerKonta; } ///< Zwraca numer konta
-		string getTypKonta() const { return typKonta; } ///< Zwraca typ konta (np. Osobiste, Oszczędnościowe)	
-		float getSaldoKonta() const { return saldoKonta; } ///< Zwraca saldo konta
-		void setNumerKonta(string numer) { numerKonta = numer; } ///< Ustala numer konta
-		void setTypKonta(string typ) { typKonta = typ; } ///< Ustala typ konta (np. Osobiste, Oszczędnościowe)
-		void setSaldoKonta(float saldo) { saldoKonta = saldo; } ///< Ustala saldo konta
+		/**
+		 * @brief Zwraca numer konta.
+		 *
+		 * @return Numer konta
+		 */
+		string getNumerKonta() const { return numerKonta; }
+		/**
+		 * @brief Zwraca typ konta.
+		 *
+		 * @return Typ konta (np. Osobiste, Oszczędnościowe)
+		 */
+		string getTypKonta() const { return typKonta; }
+		/**
+		 * @brief Zwraca saldo konta.
+		 *
+		 * @return Saldo konta
+		 */
+		float getSaldoKonta() const { return saldoKonta; }
+		/**
+		 * @brief Ustala numer konta.
+		 *
+		 * @param numer Numer konta
+		 */
+		void setNumerKonta(string numer) { numerKonta = numer; }
+		/**
+		 * @brief Ustala typ konta.
+		 *
+		 * @param typ Typ konta (np. Osobiste, Oszczędnościowe)
+		 */
+		void setTypKonta(string typ) { typKonta = typ; }
+		/**
+		 * @brief Ustala saldo konta.
+		 *
+		 * @param saldo Saldo konta
+		 */
+		void setSaldoKonta(float saldo) { saldoKonta = saldo; }
 };
 
 
