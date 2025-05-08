@@ -21,8 +21,6 @@ private:
 	string numerKarty; ///< Numer karty
 	string dataWaznosci; ///< Data waznosci karty
 	string kodCVC; ///< Kod CVC karty
-	string typKarty; ///< Typ karty (np. Debitowa, Kredytowa)
-	float saldoKarty; ///< Saldo karty (jezli dotyczy)
 public:
 	/**
 	 * @brief Konstruktor klasy Karta.
@@ -35,12 +33,11 @@ public:
 	 * @param typ Typ karty (np. Debitowa, Kredytowa)
 	 * @param saldo Saldo karty (jesli dotyczy)
 	 */
-	Karta(string numer, string data, string kod, string typ, float saldo) {
+	Karta(string numer, string data, string kod) {
 		this->numerKarty = numer;
 		this->dataWaznosci = data;
 		this->kodCVC = kod;
-		this->typKarty = typ;
-		this->saldoKarty = saldo;
+		
 	}
 	/**
 	 * @brief Zwraca numer karty.
@@ -61,18 +58,6 @@ public:
 	 */
 	string getKodCVC() const { return kodCVC; }
 	/**
-	 * @brief Zwraca typ karty.
-	 *
-	 * @return Typ karty (np. Debitowa, Kredytowa)
-	 */
-	string getTypKarty() const { return typKarty; }
-	/**
-	 * @brief Zwraca saldo karty.
-	 *
-	 * @return Saldo karty (jesli dotyczy)
-	 */
-	float getSaldoKarty() const { return saldoKarty; }
-	/**
 	 * @brief Ustala numer karty.
 	 *
 	 * @param numer Numer karty
@@ -91,18 +76,21 @@ public:
 	 */
 	void setKodCVC(string kod) { kodCVC = kod; }
 	/**
-	 * @brief Ustala typ karty.
-	 *
-	 * @param typ Typ karty (np. Debitowa, Kredytowa)
+	 * @brief Zwraca typ karty.
+	 * Metoda czysto wirtualna, musi byc zaimplementowana w klasach pochodnych.
+	 * @return Typ karty (np. Debetowa, Kredytowa)
 	 */
-	void setTypKarty(string typ) { typKarty = typ; }
+	virtual string getTypKarty() const = 0;
 	/**
-	 * @brief Ustala saldo karty.
-	 *
-	 * @param saldo Saldo karty
+	 * @brief Sprawdza, czy karta jest wazna.
+	 * @return true jeśli karta jest wazna, false w przeciwnym razie
 	 */
-	void setSaldoKarty(float saldo) { saldoKarty = saldo; }
-	
+	virtual bool czyWazna() const;
+	/**
+	 * @brief Wyswietla informacje o karcie.
+	 * Metoda czysto wirtualna, musi byc zaimplementowana w klasach pochodnych.
+	 */
+	virtual void wyswietlInformacje() const;
 };
 
 
@@ -250,7 +238,20 @@ public:
 	 * @param saldo Saldo konta
 	 */
 	void setSaldoKonta(float saldo) { saldoKonta = saldo; }
-
+	/**
+	 * @brief Wplaca pieniadze na konto.
+	 *
+	 * @param kwota Kwota do wplaty
+	 * @return true jeśli wplata powiodła się, false w przeciwnym razie
+	 */
+	virtual bool wplac(float kwota);
+	/**
+	 * @brief Wyplaca pieniadze z konta.
+	 *
+	 * @param kwota Kwota do wyplaty
+	 * @return true jeśli wyplata powiodła się, false w przeciwnym razie
+	 */
+	virtual bool wyplac(float kwota);
 };
 
 /**
@@ -326,6 +327,155 @@ public:
 };
 
 /**
+ * @class KartaDebetowa
+ * @brief Reprezentuje karte debetowa.
+ * @extends Karta
+ *
+ * Implementacja konkretnego typu karty - karty debetowej,
+ * która jest powiązana z kontem bankowym i posiada dzienny limit transakcji.
+ */
+class KartaDebetowa : public Karta {
+private:
+	string powiazaneKonto; ///< Powiązane konto bankowe
+	float dziennyLimit; ///< Dzienny limit transakcji
+public:
+	/**
+	 * @brief Konstruktor klasy KartaDebetowa.
+	 *
+	 * Inicjalizuje obiekt KartaDebetowa z podanymi parametrami.
+	 *
+	 * @param numer Numer karty
+	 * @param data Data waznosci karty
+	 * @param kod Kod CVC karty
+	 * @param powiazaneKonto Powiązane konto bankowe
+	 * @param limit Dzienny limit transakcji
+	 */
+	KartaDebetowa(string numer, string data, string kod, string powiazaneKonto, float limit)
+		: Karta(numer, data, kod), powiazaneKonto(powiazaneKonto), dziennyLimit(limit) {}
+
+	/**
+	 * @brief Zwraca typ karty
+	 * @return Typ karty
+	 *
+	 * Implementacja metody czysto wirtualnej z klasy bazowej Karta.
+	 */
+	string getTypKarty() const override { return "Debetowa"; }
+	/**
+	 * @brief Pobiera numer powiązanego konta.
+	 * @return Identyfikator konta
+	 */
+	string getPowiazaneKonto() const { return powiazaneKonto; }
+	/**
+	 * @brief  Pobiera dzienny limit transakcji
+	 * @return Wartość dziennego limitu
+	 */
+	float getDziennyLimit() const { return dziennyLimit; }
+	/**
+	 * @brief Ustawia numer powiązanego konta
+	 * @param konto Nowy identyfikator konta
+	 */
+	void setPowiazaneKonto(string konto) { powiazaneKonto = konto; }
+	/**
+	 * @brief Ustawia dzienny limit transakcji
+	 * @param limit Nowa wartość dziennego limitu
+	 */
+	void setDziennyLimit(float limit) { dziennyLimit = limit; }
+	/**
+	 * @brief Wykonuje płatność kartą
+	 * @param kwota Kwota transakcji
+	 * @return true jeśli płatność została wykonana pomyślnie, false w przeciwnym razie
+	 *
+	 * Metoda weryfikuje czy żądana kwota nie przekracza dziennego limitu transakcji
+	 * i czy karta jest ważna, a następnie wykonuje płatność.
+	 */
+	bool wykonajPlatnosc(float kwota);
+};
+/**
+ * @class KontoOszczednosciowe
+ * @brief Reprezentuje konto oszczędnościowe.
+ *
+ * Klasa dziedziczy po klasie Konto i dodaje funkcjonalności specyficzne dla kont oszczędnościowych.
+ */
+class KontoOszczednosciowe : public Konto {
+private:
+	float oprocentowanie; ///< Oprocentowanie konta oszczędnościowego
+	string dataOstatniejKapitalizacji; ///< Data ostatniej kapitalizacji odsetek
+	int ograniczenieWyplat; ///< Ograniczenie liczby wypłat w miesiącu
+public:
+	/**
+	 * @brief Konstruktor klasy KontoOszczednosciowe.
+	 *
+	 * Inicjalizuje obiekt KontoOszczednosciowe z podanymi parametrami.
+	 *
+	 * @param numer Numer konta
+	 * @param saldo Saldo konta
+	 * @param oprocentowanie Oprocentowanie konta oszczędnościowego
+	 * @param dataKapitalizacji Data ostatniej kapitalizacji odsetek
+	 * @param limitWyplat Ograniczenie liczby wypłat w miesiącu
+	 */
+	KontoOszczednosciowe(string numer, float saldo, float oprocentowanie, string dataKapitalizacji, int limitWyplat)
+		: Konto(numer, "Oszczędnościowe", saldo), oprocentowanie(oprocentowanie), dataOstatniejKapitalizacji(dataKapitalizacji), ograniczenieWyplat(limitWyplat) {}
+
+	/**
+	 * @brief Zwraca oprocentowanie konta oszczędnościowego.
+	 *
+	 * @return Oprocentowanie konta oszczędnościowego
+	 */
+	float getOprocentowanie() const { return oprocentowanie; }
+	/**
+	 * @brief Zwraca datę ostatniej kapitalizacji odsetek.
+	 *
+	 * @return Data ostatniej kapitalizacji odsetek
+	 */
+	string getDataOstatniejKapitalizacji() const { return dataOstatniejKapitalizacji; }
+
+	/**
+	* @brief Zwraca ograniczenie liczby wypłat w miesiącu.
+	*
+	* @return Ograniczenie liczby wypłat w miesiącu
+	*/
+	int getOgraniczenieWyplat() const { return ograniczenieWyplat; }
+	/**
+	 * @brief Ustala oprocentowanie konta oszczędnościowego.
+	 *
+	 * @param oprocentowanie Oprocentowanie konta oszczędnościowego
+	 */
+	void setOprocentowanie(float oprocentowanie) { this->oprocentowanie = oprocentowanie; }
+	/**
+	 * @brief Ustala datę ostatniej kapitalizacji odsetek.
+	 *
+	 * @param dataKapitalizacji Data ostatniej kapitalizacji odsetek
+	 */
+	void setDataOstatniejKapitalizacji(string data) { this->dataOstatniejKapitalizacji = data; }
+	/**
+	 * @brief Ustala ograniczenie liczby wypłat w miesiącu.
+	 *
+	 * @param limitWyplat Ograniczenie liczby wypłat w miesiącu
+	 */
+	void setOgraniczenieWyplat(int limitWyplat) { this->ograniczenieWyplat = limitWyplat; }
+	/**
+	 * @brief Oblicza i dodaje odsetki do konta.
+	 * 
+	 * @return 
+	 */
+	float kapitalizujOdsetki();
+	/**
+	 * @brief Wplaca pieniadze na konto oszczędnościowe.
+	 *
+	 * @param kwota Kwota do wplaty
+	 * @return true jeśli wplata powiodła się, false w przeciwnym razie
+	 */
+	bool wplac(float kwota) override;
+	/**
+	 * @brief Wyplaca pieniadze z konta oszczędnościowego.
+	 *
+	 * @param kwota Kwota do wyplaty
+	 * @return true jeśli wyplata powiodła się, false w przeciwnym razie
+	 */
+	bool wyplac(float kwota) override;
+
+};
+/**
  * @class Klient
  * @brief Reprezentuje klienta banku.
  * 
@@ -341,8 +491,8 @@ private:
 	string login; ///< Login klienta
 	string haslo; ///< Haslo klienta
 
-	vector<Konto> kontaUzytkownika; ///< Tablica przechowujaca konta uzytkownika
-	vector<Karta> kartyUzytkownika; ///< Tablica przechowujaca karty uzytkownika
+	vector<Konto*> kontaUzytkownika; ///< Tablica przechowujaca konta uzytkownika
+	vector<Karta*> kartyUzytkownika; ///< Tablica przechowujaca karty uzytkownika
 	vector<Lokata> lokatyUzytkownika; ///< Tablica przechowujaca lokaty uzytkownika
 
 public:
@@ -412,20 +562,6 @@ public:
 	 * @return Haslo klienta
 	 */
 	string getHaslo() const { return haslo; }
-	/**
-	 * @brief Rejestruje nowego klienta.
-	 *
-	 * Funkcja rejestruje nowego klienta w systemie, zapisujac jego dane do pliku JSON (Imie, nazwisko, PESEL, login, haslo).
-	 */
-	void rejestracja();
-
-	/**
-	 * @brief Loguje klienta do systemu.
-	 *
-	 * Funkcja loguje klienta do systemu, sprawdzajac poprawnosc podanych danych (login, haslo).
-	 */
-	void logowanie();
-
     /**
      * @brief Edytuje dane klienta.
      *
@@ -433,31 +569,6 @@ public:
      * zapisujac zmiany do pliku JSON.
      */
     void edytujDane();
-
-	/**
-	* @brief Dodaje nowe konto do listy kont uzytkownika.
-	*
-	* Funkcja umozliwia dodanie nowego konta do listy kont uzytkownika.
-	* Nowe konto jest przechowywane w wektorze kontaUzytkownika.
-	*/
-	void dodajKonto();
-
-	/**
-	 * @brief Dodaje nowa karte do listy kart uzytkownika.
-	 *
-	 * Funkcja umozliwia dodanie nowej karty do listy kart uzytkownika.
-	 * Nowa karta jest przechowywana w wektorze kartyUzytkownika.
-	 */
-	void dodajKarte();
-
-	/**
-	 * @brief Dodaje nowa lokate do listy lokat uzytkownika.
-	 *
-	 * Funkcja umozliwia dodanie nowej lokaty do listy lokat uzytkownika.
-	 * Nowa lokata jest przechowywana w wektorze lokatyUzytkownika.
-	 */
-	void dodajLokate();
-
 	/**
 	 * @brief Wyswietla dane klienta.
 	 *
@@ -476,6 +587,7 @@ class FileManager
 {
 private:
 	string nazwaPliku; ///< Nazwa pliku do odczytu/zapisu
+	string typ; ///< Typ konta bankowego lub karty
 	/**
 	 * @brief Zwraca informacje o kliencie w formacie JSON.
 	 *
@@ -484,7 +596,7 @@ private:
 	 * @param j Obiekt JSON, do którego zostaną zapisane informacje o kliencie
 	 * @param klient Obiekt Klient, którego informacje mają zostać zapisane
 	 */
-	friend void to_json_Klient(json& j, const Klient& klient);
+	void to_json_Klient(json& j, const Klient& klient);
 	/**
 	 * @brief Wczytuje informacje o kliencie z formatu JSON.
 	 *
@@ -493,7 +605,7 @@ private:
 	 * @param j Obiekt JSON, z którego zostaną odczytane informacje o kliencie
 	 * @param klient Obiekt Klient, do którego zostaną zapisane informacje
 	 */
-	friend void from_json_Klient(const json& j, Klient& klient);
+	void from_json_Klient(const json& j, Klient& klient);
 	/**
 	 * @brief Zwraca informacje o transakcji w formacie JSON.
 	 *
@@ -502,7 +614,7 @@ private:
 	 * @param j Obiekt JSON, do którego zostaną zapisane informacje o transakcji
 	 * @param transakcja Obiekt Transakcja, którego informacje mają zostać zapisane
 	 */
-	friend void to_json_Transakcja(json& j, const Transakcja& transakcja);
+	void to_json_Transakcja(json& j, const Transakcja& transakcja);
 	/**
 	 * @brief Wczytuje informacje o transakcji z formatu JSON.
 	 *
@@ -511,7 +623,7 @@ private:
 	 * @param j Obiekt JSON, z którego zostaną odczytane informacje o transakcji
 	 * @param transakcja Obiekt Transakcja, do którego zostaną zapisane informacje
 	 */
-	friend void from_json_Transakcja(const json& j, Transakcja& transakcja);
+	void from_json_Transakcja(const json& j, Transakcja& transakcja);
 	/**
 	 * @brief Zwraca informacje o karcie w formacie JSON.
 	 *
@@ -520,7 +632,7 @@ private:
 	 * @param j Obiekt JSON, do którego zostaną zapisane informacje o karcie
 	 * @param karta Obiekt Karta, którego informacje mają zostać zapisane
 	 */
-	friend void to_json_Karta(json& j, const Karta& karta);
+	void to_json_Karta(json& j, const Karta& karta);
 	/**
 	 * @brief Wczytuje informacje o karcie z formatu JSON.
 	 *
@@ -529,7 +641,7 @@ private:
 	 * @param j Obiekt JSON, z którego zostaną odczytane informacje o karcie
 	 * @param karta Obiekt Karta, do którego zostaną zapisane informacje
 	 */
-	friend void from_json_Karta(const json& j, Karta& karta);
+	void from_json_Karta(const json& j, Karta& karta);
 	/**
 	 * @brief Zwraca informacje o lokacie w formacie JSON.
 	 *
@@ -538,7 +650,7 @@ private:
 	 * @param j Obiekt JSON, do którego zostaną zapisane informacje o lokacie
 	 * @param lokata Obiekt Lokata, którego informacje mają zostać zapisane
 	 */
-	friend void to_json_Lokata(json& j, const Lokata& lokata);
+	void to_json_Lokata(json& j, const Lokata& lokata);
 	/**
 	 * @brief Wczytuje informacje o lokacie z formatu JSON.
 	 *
@@ -547,7 +659,7 @@ private:
 	 * @param j Obiekt JSON, z którego zostaną odczytane informacje o lokacie
 	 * @param lokata Obiekt Lokata, do którego zostaną zapisane informacje
 	 */
-	friend void from_json_Lokata(const json& j, Lokata& lokata);
+	void from_json_Lokata(const json& j, Lokata& lokata);
 	/**
 	 * @brief Zwraca informacje o koncie w formacie JSON.
 	 *
@@ -556,7 +668,7 @@ private:
 	 * @param j Obiekt JSON, do którego zostaną zapisane informacje o koncie
 	 * @param konto Obiekt Konto, którego informacje mają zostać zapisane
 	 */
-	friend void to_json_Konto(json& j, const Konto& konto);
+	void to_json_Konto(json& j, const Konto& konto);
 	/**
 	 * @brief Wczytuje informacje o koncie z formatu JSON.
 	 *
@@ -565,7 +677,7 @@ private:
 	 * @param j Obiekt JSON, z którego zostaną odczytane informacje o koncie
 	 * @param konto Obiekt Konto, do którego zostaną zapisane informacje
 	 */
-	friend void from_json_Konto(const json& j, Konto& konto);
+	void from_json_Konto(const json& j, Konto& konto);
 
 public:
 	/**
@@ -620,6 +732,119 @@ public:
 	vector<Konto*> wczytajKonta();
 
 };
+/**
+* @class SystemBankowy
+* @brief Główny kontroler systemu bankowego.
+*
+* Klasa zarządzająca wszystkimi funkcjonalnościami systemu bankowego,
+* odpowiedzialna za obsługę klientówm, kont, transakcji, i innych operacji bankowych.
+*/
+class SystemBankowy
+{
+private:
+	vector<Klient> klienci; ///< Wektor przechowujący klientów
+	vector<Transakcja> transakcje; ///< Wektor przechowujący transakcje
+	Klient* zalogowanyKlient; ///< Wskaźnik na aktualnie zalogowanego klienta
+	FileManager menedzerPlikow; ///< Obiekt do zarządzania plikami
+public:
+	/**
+	 * @brief Konstruktor klasy SystemBankowy.
+	 *
+	 * Inicjalizuje system bankowy, wczytując dane klientów i transakcji z plików
+	 * oraz ustawia brak zalogowanego klienta.
+	 */
+	SystemBankowy();
+	/**
+	 * @brief Uruchamia system bankowy.
+	 *
+	 * Główna metoda sterująca przepływem programu. Wyświetla menu główne
+	 * i obsługuje wybory użytkownika do moment wyjścia z programu.
+	 */
+	void uruchom();
+	/**
+	 * @brief Wyświetla menu główne systemu bankowego.
+	 *
+	 * Pokjazuje dostępne opcje dla niezalogowanego użytkownika,
+	 * takiej jak rejestracja, logowanie, czy wyjście z programu.
+	 */
+	void wyswietlMenuGlowne();
+	/**
+	 * @brief Obsługuje zalogowanego użytkownika.
+	 *
+	 * Wyświtla menu dla zalogowanego użytkownika i obsługuje
+	 * jego wybory do momentu wylogowania lub zakończenia programu.
+	 */
+	void obslugaZalogowanegoUzytkownika();
+	/**
+	 * @brief Wyświetla menu dla zalogowanego użytkownika.
+	 *
+	 * Pokazuje dostępne opcje dla zalogowanego użytkownika, takie jak
+	 * zarządzanie danymi osobowymi, kontami, kartami, lokatami, czy transakcjami.
+	 */
+	void wyswietlMenuUzytkownika();
+	/**
+	 * @brief Obsługuje proces rejestracji nowego klienta.
+	 *
+	 * Zbiera dane od użytkownika, tworzy noy obiekt Klient
+	 * i dodaje go do listy klientów banku.
+	 */
+	void zarejestrujKlienta();
+	/**
+	 * @brief Obsługuje proces logowania klienta.
+	 *
+	 * Sprawdza poprawność podanych danych logowania i
+	 * ustawia wskaźnik zalogowanegoKlienta.
+	 *
+	 * @return true jeśli logowanie powiodło się, false w przeciwnym razie
+	 */
+	bool zalogujKlienta();
+	/**
+	 * @brief Dodaje nowe konto dla zalogowanego klienta.
+	 *
+	 * Umożliwia zalogowanemu klientowi dodanie nowego konta
+	 * bankowego wybranego typu
+	 */
+	void dodajKonto();
+	/**
+	 * @brief Dodaje nową kartę dla zalogowanego klienta.
+	 *
+	 * Umożliwia zalogowanemu klientowi dodanie nowej karty
+	 * bankowej wybranego typu
+	 */
+	void dodajKarte();
+	/**
+	 * @brief Zakłada nową lokatę dla zalogowanego klienta.
+	 *
+	 * Umożliwia zalogowanemu klientowi dodanie nowej lokaty
+	 * na wybraną kwotę i okres
+	 */
+	void zalozLokate();
+	/**
+	 * @brief Wykonuje przelew z konta zalogowanego klienta.
+	 *
+	 * Umożliwia zalogowanemu klientowi wykonanie przelewu
+	 * z jednego konta na drugie, tworząc odpowiedni rekord transakcji.
+	 */
+	void wykonajPrzelew();
+	/**
+	 * @brief Wyświetla historię transakcji dla zalogowanego klienta.
+	 *
+	 * Pokazuje listę wszystkich transakcji związanych z kotami
+	 * zalogowanego kllienta.
+	 */
+	void wyswietlHistorieTransakcji();
+	/**
+	 * @brief Sprawdza, czy podany login jesy już zajęty.
+	 *
+	 * Weryfikuje, czy podany login nie jest już używany przez
+	 * innego klienta w systemie.
+	 * 
+	 * @param login Login do sprawdzenia 
+	 * @return true jeśli login istnieje, false w przeciwnym razie
+	 */
+	bool sprawdzCzyLoginIstnieje(const string& login);
+};
+
 
 
 
