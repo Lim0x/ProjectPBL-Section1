@@ -4,6 +4,12 @@
 #include <string>
 #include <vector>
 #include "json.hpp"
+#include <ctime>
+#include <iomanip>
+#include <stdexcept>
+#include <sstream>
+
+
 
 using namespace std;
 using json = nlohmann::json;
@@ -30,8 +36,6 @@ public:
 	 * @param numer Numer karty
 	 * @param data Data waznosci karty
 	 * @param kod Kod CVC karty
-	 * @param typ Typ karty (np. Debitowa, Kredytowa)
-	 * @param saldo Saldo karty (jesli dotyczy)
 	 */
 	Karta(string numer, string data, string kod) {
 		this->numerKarty = numer;
@@ -50,7 +54,10 @@ public:
 	 *
 	 * @return Data waznosci karty
 	 */
-	string getDataWaznosci() const { return dataWaznosci; }
+	string getDataWaznosci() const
+	{
+		return dataWaznosci.substr(0, 2) + "/20" + dataWaznosci.substr(2, 2);
+	}
 	/**
 	 * @brief Zwraca kod CVC karty.
 	 *
@@ -68,7 +75,21 @@ public:
 	 *
 	 * @param data Data waznosci karty
 	 */
-	void setDataWaznosci(string data) { dataWaznosci = data; }
+	void setDataWaznosci(string data)
+	{
+		if (data.length() ==4) // Format "MMRR"
+		{
+			dataWaznosci = data;
+		}
+		else if (data.length()==7 && data[2] == '/') // Format "MM/YYYY"
+		{
+			dataWaznosci = data.substr(0, 2) + data.substr(5, 2);
+		}
+		else
+		{
+			throw invalid_argument("Niepoprawny format daty. Oczekiwano formatu MMRR lub MM/YYYY");
+		}
+	}
 	/**
 	 * @brief Ustala kod CVC karty.
 	 *
@@ -77,7 +98,7 @@ public:
 	void setKodCVC(string kod) { kodCVC = kod; }
 	/**
 	 * @brief Zwraca typ karty.
-	 * Metoda czysto wirtualna, musi byc zaimplementowana w klasach pochodnych.
+	 * 
 	 * @return Typ karty (np. Debetowa, Kredytowa)
 	 */
 	virtual string getTypKarty() const = 0;
@@ -85,12 +106,41 @@ public:
 	 * @brief Sprawdza, czy karta jest wazna.
 	 * @return true jeśli karta jest wazna, false w przeciwnym razie
 	 */
-	virtual bool czyWazna() const;
+	virtual bool czyWazna() const
+	{
+		if (dataWaznosci.length() != 4) {
+			return false; // Niepoprawny format daty
+		}
+		try{
+			// Pobiera aktualny czas i konwertuje na lokalny dzien, miesiac
+		time_t now = time(nullptr);
+		tm today;
+		localtime_s(&today, &now);
+
+		int miesiac = stoi(dataWaznosci.substr(0, 2));
+		int rok = 2000 + stoi(dataWaznosci.substr(2, 2));
+
+		return (rok > today.tm_year + 1900 || (rok == today.tm_year + 1900 && miesiac >= today.tm_mon + 1));
+		}
+		catch (...) {
+			return false; // Niepoprawny format daty
+		}
+	}
 	/**
 	 * @brief Wyswietla informacje o karcie.
-	 * Metoda czysto wirtualna, musi byc zaimplementowana w klasach pochodnych.
+	 *
+	 * Funkcja wyswietla szczegóły karty, takie jak numer karty, data waznosci, kod CVC oraz status karty.
 	 */
-	virtual void wyswietlInformacje() const;
+	virtual void wyswietlInformacje() const
+	{
+		cout << "===== DANE KARTY =====" << endl;
+		cout << "Typ karty: " << getTypKarty() << endl;
+		cout << "Numer karty: " << getNumerKarty() << endl;
+		cout << "Data waznosci: " << getDataWaznosci() << endl;
+		cout << "Kod CVC: " << getKodCVC() << endl;
+		cout << "Status: " << (czyWazna() ? "Wazna" : "Niewazna") << endl;
+		cout << "======================" << endl;
+	}
 };
 
 
@@ -104,6 +154,7 @@ class Lokata {
 	float kwota; ///< Kwota lokaty
 	float oprocentowanie; ///< Oprocentowanie lokaty
 	string dataOddania; ///< Data oddania lokaty
+	string powiazaneKonto; ///< Powiązane konto bankowe
 
 public:
 	/**
@@ -116,10 +167,11 @@ public:
 	 * @param dataOddania Data oddania lokaty
 	 * @param wlasciciel Wlasciciel lokaty
 	 */
-	Lokata(float kwota, float oprocentowanie, const string& dataOddania) {
+	Lokata(float kwota, float oprocentowanie, const string& dataOddania, string wlasciciel) {
 		this->kwota = kwota;
 		this->oprocentowanie = oprocentowanie;
 		this->dataOddania = dataOddania;
+		this->powiazaneKonto = wlasciciel;
 	}
 	/**
 	 * @brief Konstruktor domyslny klasy Lokata.
@@ -164,18 +216,82 @@ public:
 	 *
 	 * @return Data oddania lokaty
 	 */
-	const string& getDataOddania() const { return dataOddania; }
-	
+	const string& getDataOddania() const { return dataOddania.substr(0, 2) + "/20"
+		+ dataOddania.substr(2, 2); }
+
+	/**
+	 * @brief Zwraca konto powiazane z dana lokata.
+	 *
+	 * @return Powiazane konto
+	 */
+	string getPowiazaneKonto() const { return powiazaneKonto; }
+
+	/**
+	 * @brief Sprawdza czy lokata jest aktywna.
+	 *
+	 * @return true jeśli lokata jest aktywna, false w przeciwnym razie
+	 */
+	bool czyAktywna() const
+	{
+		if (dataOddania.length() != 4)
+		{
+			return false; // Niepoprawny format daty
+		}
+		try
+		{
+			// Pobiera aktualny czas i konwertuje na lokalny dzien, miesiac
+			time_t now = time(nullptr);
+			tm today;
+			localtime_s(&today, &now);
+
+			int miesiac = stoi(dataOddania.substr(0, 2));
+			int rok = 2000 + stoi(dataOddania.substr(2, 2));
+
+			return (rok > today.tm_year + 1900 || (rok == today.tm_year + 1900 && miesiac >= today.tm_mon + 1));
+		}
+		catch (...)
+		{
+			return false; // Niepoprawny format daty
+		}
+	}
+	/**
+	 * @brief Oblicza zysk z lokaty.
+	 *
+	 * @return Zysk z lokaty
+	 */
+	double obliczZysk() const
+	{
+		if (oprocentowanie < 0) return 0.0; // Oprocentowanie nie moze byc ujemne
+		return kwota * (oprocentowanie / 100);
+	}
+
+	/**
+ * @brief Wyswietla informacje o lokacie.
+ *
+ * Funkcja wyswietla szczegóły lokaty, takie jak kwota, oprocentowanie, data oddania,
+ * zysk roczny oraz status lokaty.
+ */
+	void wyswietlInformacje() const
+	{
+		cout << "===== DANE LOKATY =====" << endl;
+		cout << "Kwota: " << fixed<<setprecision(2)<<getKwota() <<"PLN"<< endl;
+		cout << "Oprocentowanie: " << getOprocentowanie() << "%" << endl;
+		cout << "Data oddania: " << getDataOddania() << endl;
+		cout << "Zysk roczny: " << obliczZysk() << " PLN" << endl;
+		cout << "Status: " << (czyAktywna() ? "Aktywna" : "Nieaktywna") << endl;
+		cout << "Konto powiazane: " << getPowiazaneKonto() << endl;
+		cout << "======================" << endl;
+	}
 };
 
 /**
- * @class Konto
+ * @class KontoGlowne
  * @brief Reprezentuje konto.
  * 
  * 
  *  Klasa przechowuje podtsawowe dane dane i funkcje zwiazane z kontami 
  */
-class Konto {
+class KontoGlowne {
 private:
 	string numerKonta; ///< Numer konta
 	string typKonta; ///< Typ konta (np. Osobiste, Oszczędnościowe)
@@ -191,7 +307,7 @@ public:
 	 * @param typ Typ konta (np. Osobiste, Oszczędnościowe)
 	 * @param saldo Saldo konta
 	 */
-	Konto(string numer, string typ, float saldo) {
+	KontoGlowne(string numer, string typ, float saldo) {
 			this->numerKonta = numer;
 			this->typKonta = typ;
 			this->saldoKonta = saldo;
@@ -201,7 +317,7 @@ public:
 	 *
 	 * Inicjalizuje obiekt Konto z domyslnymi wartosciami.
 	 */
-	Konto() = default;
+	KontoGlowne() = default;
 	/**
 	 * @brief Zwraca numer konta.
 	 *
@@ -237,21 +353,66 @@ public:
 	 *
 	 * @param saldo Saldo konta
 	 */
-	void setSaldoKonta(float saldo) { saldoKonta = saldo; }
+	void setSaldoKonta(float saldo)
+	{
+		if (saldo < 0) {
+			cout << "Saldo nie moze byc ujemne." << endl;
+			return;
+		}
+		saldoKonta = saldo;
+	}
 	/**
 	 * @brief Wplaca pieniadze na konto.
 	 *
 	 * @param kwota Kwota do wplaty
 	 * @return true jeśli wplata powiodła się, false w przeciwnym razie
 	 */
-	virtual bool wplac(float kwota);
+	virtual bool wplac(float kwota)
+	{
+		if (kwota <= 0) {
+			cout << "Kwota do wplaty musi byc wieksza od zera." << endl;
+			return false;
+		}
+		saldoKonta += kwota;
+		cout << "Wplata zakonczona sukcesem. Nowe saldo: " << saldoKonta << " PLN" << endl;
+		return true;
+
+	}
 	/**
 	 * @brief Wyplaca pieniadze z konta.
 	 *
 	 * @param kwota Kwota do wyplaty
 	 * @return true jeśli wyplata powiodła się, false w przeciwnym razie
 	 */
-	virtual bool wyplac(float kwota);
+	virtual bool wyplac(float kwota)
+	{
+		if (kwota <= 0) {
+			cout << "Kwota do wyplaty musi byc wieksza od zera." << endl;
+			return false;
+		}
+		if (kwota > saldoKonta) {
+			cout << "Niewystarczajace srodki na koncie." << endl;
+			return false;
+		}
+		saldoKonta -= kwota;
+		cout << "Wyplata zakonczona sukcesem. Nowe saldo: " << saldoKonta << " PLN" << endl;
+		return true;
+
+	}
+
+	/**
+	 * @brief Wyswietla informacje o koncie.
+	 *
+	 * Funkcja wyswietla szczegóły konta, takie jak numer konta, typ konta i saldo.
+	 */
+	virtual void wyswietlInformacje() const
+	{
+		cout << "===== DANE KONTA =====" << endl;
+		cout << "Typ konta: " << getTypKonta() << endl;
+		cout << "Numer konta: " << getNumerKonta() << endl;
+		cout << "Saldo: " << fixed << setprecision(2) << getSaldoKonta() << "PLN" << endl;
+		cout << "======================" << endl;
+	}
 };
 
 /**
@@ -276,11 +437,73 @@ public:
 	 */
 	Transakcja() = default;
 	/**
+	 * @brief  Ustala kwote transakcji.
+	 * 
+	 * @param kwota Kwota transakcji
+	 */
+	void setKwota(float kwota)
+	{
+		if (kwota < 0) {
+			cout << "Kwota transakcji nie moze byc ujemna." << endl;
+			return;
+		}
+		this->kwota = kwota;
+	}
+	/**
+	 * @brief Ustala typ transakcji.
+	 *
+	 * @param typTransakcji Typ transakcji (np. Wpłata, wypłata, przelew)
+	 */
+	void setTypTransakcji(const string &typTransakcji)
+	{
+		if (typTransakcji != "wplata" && typTransakcji != "wypata" && typTransakcji != "przelew") {
+			cout << "Niepoprawny typ transakcji." << endl;
+			return;
+		}
+		this->typTransakcji = typTransakcji;
+	}
+	/**
+	 * @brief Ustala konto nadawcy.
+	 *
+	 * @param kontoNadawcy Numer konta nadawcy
+	 */
+	void setKontoNadawcy(const string &kontoNadawcy)
+	{
+		if (kontoNadawcy.empty() && typTransakcji == "przelew")
+		{
+			throw invalid_argument("Niepoprawny numer konta nadawcy.");
+		}
+		this->kontoNadawcy = kontoNadawcy;
+	}
+	/**
+	 * @brief Ustala konto odbiorcy.
+	 *
+	 * @param kontoOdbiorcy Numer konta odbiorcy
+	 */
+	void setKontoOdbiorcy(const string &kontoOdbiorcy)
+	{
+		if (kontoOdbiorcy.empty() && typTransakcji == "przelew")
+		{
+			throw invalid_argument("Niepoprawny numer konta odbiorcy.");
+		}
+		this->kontoOdbiorcy = kontoOdbiorcy;
+	}
+	/**
 	* @brief Zwraca bieżącą datę w formacie "DD-MM-YYYY".
 	*
 	* @return Bieżąca data w formacie "DD-MM-YYYY"
 	*/
-	string getAktualnaData();
+	string getAktualnaData()
+	{
+		time_t now = time(nullptr);
+		tm today;
+		localtime_s(&today, &now);
+
+		ostringstream ss;
+
+		ss << put_time(&today, "%d-%m-%Y %H:%M:%S");
+		return ss.str();
+	}
 	/**
 	 * @brief Zwraca kwote transakcji.
 	 *
@@ -316,14 +539,46 @@ public:
 	 *
 	 * Funckja ustala szczegóły transakcji, takie jak kwota, typ transakcji, data transakcji oraz numery kont nadawcy i odbiorcy.
 	 */
-	void szczegolyTransakcji();
+	void szczegolyTransakcji()
+	{
+		cout << "Podaj kwote transakcji: ";
+		float kwotaWpisana;
+		cin >> kwotaWpisana;
+		setKwota(kwotaWpisana);
+
+		cout << "Podaj typ transakcji (wplata/wypata/przelew): ";
+		string typTransakcjiWpisany;
+		cin >> typTransakcjiWpisany;
+		setTypTransakcji(typTransakcjiWpisany);
+
+		dataTransakcji = getAktualnaData();
+
+		if (typTransakcji == "przelew")
+		{
+			cout << "Podaj numer konta nadawcy: ";
+			cin >> kontoNadawcy;
+			cout << "Podaj numer konta odbiorcy: ";
+			cin >> kontoOdbiorcy;
+		}
+	}
 	/**
 	 * @brief Wyświetla szczegóły transakcji.
 	 *
 	 * Funckja wyświetla szczegóły transakcji, takie jak kwota, typ transakcji, data transakcji oraz numery kont nadawcy i odbiorcy.
 	 */
-	void wyswietlSzczegolyTransakcji();
-	
+	void wyswietlSzczegolyTransakcji() const
+	{
+		cout << "===== SZCZEGOLY TRANSAKCJI =====" << endl;
+		cout << "Data transakcji: " << getDataTransakcji() << endl;
+		cout << "Typ transakcji: " << getTypTransakcji() << endl;
+		cout << "Kwota: " << fixed << setprecision(2) << getKwota() << " PLN" << endl;
+		if (typTransakcji == "przelew")
+		{
+			cout << "Konto nadawcy: " << getKontoNadawcy() << endl;
+			cout << "Konto odbiorcy: " << getKontoOdbiorcy() << endl;
+		}
+		cout << "===============================" << endl;
+	}
 };
 
 /**
@@ -396,7 +651,7 @@ public:
  *
  * Klasa dziedziczy po klasie Konto i dodaje funkcjonalności specyficzne dla kont oszczędnościowych.
  */
-class KontoOszczednosciowe : public Konto {
+class KontoOszczednosciowe : public KontoGlowne {
 private:
 	float oprocentowanie; ///< Oprocentowanie konta oszczędnościowego
 	string dataOstatniejKapitalizacji; ///< Data ostatniej kapitalizacji odsetek
@@ -414,7 +669,7 @@ public:
 	 * @param limitWyplat Ograniczenie liczby wypłat w miesiącu
 	 */
 	KontoOszczednosciowe(string numer, float saldo, float oprocentowanie, string dataKapitalizacji, int limitWyplat)
-		: Konto(numer, "Oszczędnościowe", saldo), oprocentowanie(oprocentowanie), dataOstatniejKapitalizacji(dataKapitalizacji), ograniczenieWyplat(limitWyplat) {}
+		: KontoGlowne(numer, "Oszczędnościowe", saldo), oprocentowanie(oprocentowanie), dataOstatniejKapitalizacji(dataKapitalizacji), ograniczenieWyplat(limitWyplat) {}
 
 	/**
 	 * @brief Zwraca oprocentowanie konta oszczędnościowego.
@@ -491,7 +746,7 @@ private:
 	string login; ///< Login klienta
 	string haslo; ///< Haslo klienta
 
-	vector<Konto*> kontaUzytkownika; ///< Tablica przechowujaca konta uzytkownika
+	vector<KontoGlowne*> kontaUzytkownika; ///< Tablica przechowujaca konta uzytkownika
 	vector<Karta*> kartyUzytkownika; ///< Tablica przechowujaca karty uzytkownika
 	vector<Lokata> lokatyUzytkownika; ///< Tablica przechowujaca lokaty uzytkownika
 
@@ -668,7 +923,7 @@ private:
 	 * @param j Obiekt JSON, do którego zostaną zapisane informacje o koncie
 	 * @param konto Obiekt Konto, którego informacje mają zostać zapisane
 	 */
-	void to_json_Konto(json& j, const Konto& konto);
+	void to_json_Konto(json& j, const KontoGlowne& konto);
 	/**
 	 * @brief Wczytuje informacje o koncie z formatu JSON.
 	 *
@@ -677,7 +932,7 @@ private:
 	 * @param j Obiekt JSON, z którego zostaną odczytane informacje o koncie
 	 * @param konto Obiekt Konto, do którego zostaną zapisane informacje
 	 */
-	void from_json_Konto(const json& j, Konto& konto);
+	void from_json_Konto(const json& j, KontoGlowne& konto);
 
 public:
 	/**
@@ -724,12 +979,12 @@ public:
 	 * @brief Zapisuje dane kont do pliku JSON.
 	 * @param konta Wektor kont do zapisania
 	 */
-	void zapiszKonta(const vector<Konto*>& konta);
+	void zapiszKonta(const vector<KontoGlowne*>& konta);
 	/**
 	 * @brief Wczytuje dane kont z pliku JSON.
 	 * @return Wektor kont odczytanych z pliku
 	 */
-	vector<Konto*> wczytajKonta();
+	vector<KontoGlowne*> wczytajKonta();
 
 };
 /**
@@ -853,5 +1108,6 @@ public:
 
 
 int main(int argc, char** argv) {
+
 	return 0;
 }
