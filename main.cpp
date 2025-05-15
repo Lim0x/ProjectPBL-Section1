@@ -1577,13 +1577,18 @@ private:
 		j["numer"] = konto.getNumerKonta();
 		j["typ"] = konto.getTypKonta();
 		j["saldo"] = konto.getSaldoKonta();
-		j["wlasciciel"] = konto.getWlasciciel();
+		
 
 		if (const KontoOszczednosciowe* oszcz = dynamic_cast<const KontoOszczednosciowe*>(&konto))
 		{
 			j["oprocentowanie"] = oszcz->getOprocentowanie();
 			j["data_kapitalizacji"] = oszcz->getDataOstatniejKapitalizacji();
 			j["limit_wyplat"] = oszcz->getOgraniczenieWyplat();
+			j["wlasciciel"] = konto.getWlasciciel();
+		}
+		else
+		{
+			j["wlasciciel"] = konto.getWlasciciel();
 		}
 	}
 	/**
