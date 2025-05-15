@@ -327,6 +327,7 @@ private:
 	string numerKonta; ///< Numer konta
 	string typKonta; ///< Typ konta (np. Osobiste, Oszczędnościowe)
 	float saldoKonta; ///< Saldo konta
+	string wlasciciel; ///< Właściciel konta
 
 public:
 	/**
@@ -361,12 +362,26 @@ public:
 	 * @return Typ konta (np. Osobiste, Oszczędnościowe)
 	 */
 	string getTypKonta() const { return typKonta; }
+
 	/**
 	 * @brief Zwraca saldo konta.
 	 *
 	 * @return Saldo konta
 	 */
 	float getSaldoKonta() const { return saldoKonta; }
+	/**
+	 * @brief Zwraca wlasciciela konta.
+	 *
+	 * @return Wlasciciel konta
+	 */
+	string getWlasciciel() const { return wlasciciel; }
+
+	/**
+	 * @brief Ustala wlasciciela konta.
+	 *
+	 * @param wlasciciel Wlasciciel konta
+	 */
+	void setWlascicielel(string wlasciciel) { this->wlasciciel = wlasciciel; }
 	/**
 	 * @brief Ustala numer konta.
 	 *
@@ -1562,6 +1577,7 @@ private:
 		j["numer"] = konto.getNumerKonta();
 		j["typ"] = konto.getTypKonta();
 		j["saldo"] = konto.getSaldoKonta();
+		j["wlasciciel"] = konto.getWlasciciel();
 
 		if (const KontoOszczednosciowe* oszcz = dynamic_cast<const KontoOszczednosciowe*>(&konto))
 		{
@@ -1582,6 +1598,9 @@ private:
 		string typ = j.at("typ").get<string>();
 		string numer = j.at("numer").get<string>();
 		float saldo = j.at("saldo").get<float>();
+		string wlasciciel = j.at("wlasciciel").get<string>();
+
+		KontoGlowne* noweKonto = nullptr;
 
 		if (typ == "Oszczednosciowe")
 		{
@@ -1592,9 +1611,14 @@ private:
 		}
 		else
 		{
-			return new KontoGlowne(numer, typ, saldo);
+			noweKonto =  new KontoGlowne(numer, typ, saldo);
 		}
 
+		if (noweKonto)
+		{
+			noweKonto->setWlascicielel(wlasciciel);
+		}
+		return noweKonto;
 	}
 
 public:
@@ -1925,7 +1949,7 @@ public:
 		{
 			for (auto konto : wszystkieKonta)
 			{
-				if (konto->getNumerKonta().find(klient.getPesel()) != string::npos)
+				if (konto->getWlasciciel() == klient.getPesel())
 				{
 					klient.dodajKonto(konto);
 				}
@@ -1935,18 +1959,26 @@ public:
 			{
 				if (auto kartaDebetowa = dynamic_cast<KartaDebetowa*>(karta))
 				{
-					if (karta->getNumerKarty().find(klient.getPesel()) != string::npos)
+					for (auto kontoKlienta : klient.getKontaUzytkownika())
 					{
-						klient.dodajKarte(karta);
+						if (kartaDebetowa->getPowiazaneKonto() == kontoKlienta->getNumerKonta())
+						{
+							klient.dodajKarte(karta);
+							break; // Zatrzymujemy petle, gdy znajdziemy powiazanie
+						}
 					}
 				}
 			}
 
 			for (auto lokata : wszystkieLokaty)
 			{
-				if (lokata.getPowiazaneKonto().find(klient.getPesel()) != string::npos)
+				for (auto kontoKlienta : klient.getKontaUzytkownika())
 				{
-					klient.dodajLokate(lokata);
+					if (lokata.getPowiazaneKonto() == kontoKlienta->getNumerKonta())
+					{
+						klient.dodajLokate(lokata);
+						break; // Zatrzymujemy petle, gdy znajdziemy powiazanie
+					}
 				}
 			}
 		}
@@ -2220,6 +2252,7 @@ public:
 		if (typ == 1)
 		{
 			KontoGlowne* noweKonto = new KontoGlowne(numerKonta, "Glowne", saldo);
+			noweKonto->setWlascicielel(zalogowanyKlient->getPesel());
 			zalogowanyKlient->dodajKonto(noweKonto);
 			wszystkieKonta.push_back(noweKonto);
 		}
@@ -2242,10 +2275,11 @@ public:
 
 
 			KontoOszczednosciowe* noweKonto = new KontoOszczednosciowe(numerKonta, saldo, oprocentowanie, dataKapitalizacji , limit);
+			noweKonto->setWlascicielel(zalogowanyKlient->getPesel());
 			zalogowanyKlient->dodajKonto(noweKonto);
 			wszystkieKonta.push_back(noweKonto);
 		}
-		menedzerPlikow.zapiszKonta(zalogowanyKlient->getKontaUzytkownika()); // Zapisujemy zmiany do pliku
+		menedzerPlikow.zapiszKonta(wszystkieKonta); // Zapisujemy zmiany do pliku
 		cout << "Konto dodane pomyslnie!" << endl;
 	}
 	/**
