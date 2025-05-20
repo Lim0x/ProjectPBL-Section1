@@ -88,7 +88,7 @@ public:
 		}
 		else
 		{
-			throw invalid_argument("Niepoprawny format daty. Oczekiwano formatu MMRR lub MM/YYYY");
+			throw Error("Niepoprawny format daty. Oczekiwano formatu MMRR lub MM/YYYY");
 		}
 	}
 	/**
@@ -108,7 +108,7 @@ public:
 			pin = nowyPin;
 		}
 		else {
-			throw invalid_argument("PIN musi mieć 4 cyfry");
+			throw Error("PIN musi mieć 4 cyfry");
 		}
 	}
 	/**
@@ -515,7 +515,7 @@ public:
 	{
 		if (kontoNadawcy.empty() && typTransakcji == "przelew")
 		{
-			throw invalid_argument("Niepoprawny numer konta nadawcy.");
+			throw Error("Niepoprawny numer konta nadawcy.");
 		}
 		this->kontoNadawcy = kontoNadawcy;
 	}
@@ -528,7 +528,7 @@ public:
 	{
 		if (kontoOdbiorcy.empty() && typTransakcji == "przelew")
 		{
-			throw invalid_argument("Niepoprawny numer konta odbiorcy.");
+			throw Error("Niepoprawny numer konta odbiorcy.");
 		}
 		this->kontoOdbiorcy = kontoOdbiorcy;
 	}
@@ -545,7 +545,7 @@ public:
 		}
 		else
 		{
-			throw invalid_argument("Niepoprawny format daty. Oczekiwano formatu MMRR lub MM/YYYY");
+			throw Error("Niepoprawny format daty. Oczekiwano formatu MMRR lub MM/YYYY");
 		}
 	}
 	/**
@@ -698,7 +698,7 @@ public:
 	{
 		if (limit<0)
 		{
-			throw invalid_argument("Dzienny limit nie moze byc ujemny.");
+			throw Error("Dzienny limit nie moze byc ujemny.");
 		}
 		dziennyLimit = limit;
 	}
@@ -826,7 +826,7 @@ public:
 		}
 		else
 		{
-			throw invalid_argument("Niepoprawny format daty. Oczekiwano formatu MMRR lub MM/YYYY");
+			throw Error("Niepoprawny format daty. Oczekiwano formatu MMRR lub MM/YYYY");
 		}
 	}
 	/**
@@ -2564,7 +2564,17 @@ public:
 		return false;
 	}
 };
-
+/**
+ * @class Error
+ * @brief Odpowiada za wypisywanie wyjątków.
+ *
+ *
+ *	Odpowiada za wypisywanie wyjątków które wydarzyły się podczas działania programu
+ */
+class Error : public invalid_argument {
+public:
+	Error(const string& message): invalid_argument(message) {}
+};
 int main(int argc, char** argv) {
 
 	srand(static_cast<unsigned int>(time(nullptr)));
