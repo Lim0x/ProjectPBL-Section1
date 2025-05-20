@@ -2285,12 +2285,20 @@ public:
 		else if (typ == 2)
 		{
 			float oprocentowanie;
-			int limit;
+			while (cout << "Podaj oprocentowanie: " && !(cin >> oprocentowanie)) {
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+			}
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-			cout << "Podaj oprocentowanie: ";
-			cin >> oprocentowanie;
-			cout << "Podaj limit wyplat: ";
-			cin >> limit;
+			int limit;
+			while (cout << "Podaj limit wyplat: " && !(cin >> limit)) {
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+			}
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 			time_t now = time(nullptr);
 			tm today;
@@ -2298,7 +2306,6 @@ public:
 
 			string dataKapitalizacji = to_string(today.tm_mon + 1)
 			+ to_string((today.tm_year + 1900) % 100);
-
 
 			KontoOszczednosciowe* noweKonto = new KontoOszczednosciowe(numerKonta, saldo, oprocentowanie, dataKapitalizacji , limit);
 			noweKonto->setWlascicielel(zalogowanyKlient->getPesel());
@@ -2323,23 +2330,21 @@ public:
 		}
 
 		string numerKarty, dataWaznosci, cvc, pin;
-		float limit;
-		int wyborKonta;
 
 		cout << "===== DODAWANIE KARTY =====" << endl;
-		cout << "Wybiewz konto do ktorego chcesz dodac karte: " << endl;
+		cout << "Wybierz konto do ktorego chcesz dodac karte: " << endl;
 		for (size_t i = 0; i < zalogowanyKlient->getKontaUzytkownika().size(); ++i)
 		{
 			cout << i + 1 << ". " << zalogowanyKlient->getKontaUzytkownika()[i]->getNumerKonta() << endl;
 		}
-		cout << "Wybierz opcje: ";
-		cin >> wyborKonta;
 
-		if (wyborKonta <1 || wyborKonta > zalogowanyKlient->getKontaUzytkownika().size())
-		{
-			cout << "Niepoprawny wybor konta." << endl;
-			return;
+		int wyborKonta;
+		while (cout << "Wybierz opcje: " && (!(cin >> wyborKonta) || (wyborKonta < 1 || wyborKonta > zalogowanyKlient->getKontaUzytkownika().size()))) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
 		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		string powiazaneKonto = zalogowanyKlient->getKontaUzytkownika()[wyborKonta - 1]->getNumerKonta();
 		cout << "Podaj numer karty: (16 cyfr) ";
@@ -2350,8 +2355,14 @@ public:
 		cin >> cvc;
 		cout << "Podaj PIN: (4 cyfry) ";
 		cin >> pin;
-		cout << "Podaj dzienny limit transakcji: ";
-		cin >> limit;
+
+		float limit;
+		while (cout << "Podaj dzienny limit transakcji: " && !(cin >> limit)) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		try
 		{
@@ -2533,13 +2544,6 @@ public:
 		return false;
 	}
 };
-
-
-
-
-
-
- 
 
 int main(int argc, char** argv) {
 
