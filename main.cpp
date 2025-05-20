@@ -2392,9 +2392,7 @@ public:
 			return;
 		}
 
-		float kwota, oprocentowanie;
 		string dataOddania;
-		int wyborKonta;
 
 		cout << "===== ZAKLADANIE LOKATY =====" << endl;
 		cout << "Wybierz konto do ktorego chcesz dodac lokate: " << endl;
@@ -2402,24 +2400,37 @@ public:
 		{
 			cout << i + 1 << ". " << zalogowanyKlient->getKontaUzytkownika()[i]->getNumerKonta() << endl;
 		}
-		cout << "Wybierz opcje: ";
-		cin >> wyborKonta;
 
-		if (wyborKonta < 1 || wyborKonta > zalogowanyKlient->getKontaUzytkownika().size())
-		{
-			cout << "Niepoprawny wybor konta." << endl;
-			return;
+		int wyborKonta;
+		while (cout << "Wybierz opcje: " && (!(cin >> wyborKonta) || (wyborKonta < 1 || wyborKonta > zalogowanyKlient->getKontaUzytkownika().size()))) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
 		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		KontoGlowne* wybraneKonto = zalogowanyKlient->getKontaUzytkownika()[wyborKonta - 1];
-		cout << "Podaj kwote lokaty: ";
-		cin >> kwota;
-		cout << "Podaj oprocentowanie (%): ";
-		cin >> oprocentowanie;
+
+		float kwota;
+		while (cout << "Podaj kwote lokaty: " && !(cin >> kwota)) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+		float oprocentowanie;
+		while (cout << "Podaj oprocentowanie (%): " && !(cin >> oprocentowanie)) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 		cout << "Podaj date oddania lokaty: (MMRR) ";
 		cin >> dataOddania;
 
-		if (wybraneKonto->getSaldoKonta()<kwota)
+		if (wybraneKonto->getSaldoKonta() < kwota)
 		{
 			cout << "Nie masz wystarczających środków na koncie." << endl;
 			return;
