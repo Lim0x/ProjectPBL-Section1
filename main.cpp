@@ -11,8 +11,6 @@
 #include <stdexcept>
 #include <exception>
 
-
-
 using namespace std;
 using json = nlohmann::json;
 
@@ -44,7 +42,7 @@ public:
 		this->numerKarty = numer;
 		this->dataWaznosci = data;
 		this->kodCVC = kod;
-		
+
 	}
 	/**
 	 * @brief Zwraca numer karty.
@@ -115,7 +113,7 @@ public:
 	}
 	/**
 	 * @brief Zwraca typ karty.
-	 * 
+	 *
 	 * @return Typ karty (np. Debetowa, Kredytowa)
 	 */
 	virtual string getTypKarty() const = 0;
@@ -318,9 +316,9 @@ public:
 /**
  * @class KontoGlowne
  * @brief Reprezentuje konto.
- * 
- * 
- *  Klasa przechowuje podtsawowe dane dane i funkcje zwiazane z kontami 
+ *
+ *
+ *  Klasa przechowuje podtsawowe dane dane i funkcje zwiazane z kontami
  */
 class KontoGlowne {
 private:
@@ -484,7 +482,7 @@ public:
 	Transakcja() = default;
 	/**
 	 * @brief  Ustala kwote transakcji.
-	 * 
+	 *
 	 * @param kwota Kwota transakcji
 	 */
 	void setKwota(float kwota)
@@ -887,8 +885,8 @@ public:
 	}
 	/**
 	 * @brief Oblicza i dodaje odsetki do konta.
-	 * 
-	 * @return 
+	 *
+	 * @return
 	 */
 	float kapitalizujOdsetki()
 	{
@@ -978,9 +976,9 @@ public:
 /**
  * @class Klient
  * @brief Reprezentuje klienta banku.
- * 
- * 
- *  Klasa przechowuje dane osobowe oraz udostepnia podstawowe funkcje zwiazane z uzytkownikiem 
+ *
+ *
+ *  Klasa przechowuje dane osobowe oraz udostepnia podstawowe funkcje zwiazane z uzytkownikiem
  */
 class Klient
 {
@@ -1105,8 +1103,8 @@ public:
 
 	/**
 	 * @brief Dodaje konto do listy kont uzytkownika.
-	 * 
-	 * @param konto Wskaznik na obiekt konta do doania 
+	 *
+	 * @param konto Wskaznik na obiekt konta do doania
 	 */
 	void dodajKonto(KontoGlowne* konto)
 	{
@@ -1145,8 +1143,8 @@ public:
 
 	/**
 	 * @brief Zwraca liste kart uzytkownika.
-	 * 
-	 * @return Wektor wskaznikow na katry klientow 
+	 *
+	 * @return Wektor wskaznikow na katry klientow
 	 */
 	vector<Karta*>& getKartyUzytkownika()
 	{
@@ -1166,10 +1164,10 @@ public:
 
 	/**
 	 * @brief Znajduje konto po numerze.
-	 * 
+	 *
 	 * @param numerKonta Numer konta do znalezienia
-	 * 
-	 * @return Wskaznik na znalezione konto lub nullptr jesli nie znaleziono 
+	 *
+	 * @return Wskaznik na znalezione konto lub nullptr jesli nie znaleziono
 	 */
 	KontoGlowne* znajdzKonto(const string& numerKonta)
 	{
@@ -1266,52 +1264,55 @@ public:
      * Funkcja umozliwia edycje danych klienta, takich jak imie, nazwisko, czy PESEL,
      * zapisujac zmiany do pliku JSON.
      */
-    void edytujDane()
-	{
-		int opcja;
-		string nowaWartosc;
-
+    void edytujDane() {
 		cout << "===== EDYCJA DANYCH =====" << endl;
 		cout << "1. Imie" << endl;
 		cout << "2. Nazwisko" << endl;
 		cout << "3. PESEL" << endl;
 		cout << "4. Haslo" << endl;
 		cout << "0. Powrot" << endl;
-		cout << "Wybierz opcje: ";
-		cin >> opcja;
 
-		switch (opcja)
-		{
-		case 1:
-			cout << "Podaj nowe imie: ";
-			cin >> nowaWartosc;
-			setImie(nowaWartosc);
-			cout << "Imie zostalo zmienione." << endl;
-			break;
-		case 2:
-			cout << "Podaj nowe nazwisko: ";
-			cin >> nowaWartosc;
-			setNazwisko(nowaWartosc);
-			cout << "Nazwisko zostalo zmienione." << endl;
-			break;
-		case 3:
-			cout << "Podaj nowy PESEL: ";
-			cin >> nowaWartosc;
-			setPesel(nowaWartosc);
-			cout << "PESEL zostal zmieniony." << endl;
-			break;
-		case 4:
-			cout << "Podaj nowe haslo: ";
-			cin >> nowaWartosc;
-			setHaslo(nowaWartosc);
-			cout << "Haslo zostalo zmienione." << endl;
-			break;
-		case 0:
-			cout << "Powrot do menu." << endl;
-			break;
-		default:
-			cout << "Niepoprawny wybor." << endl;
-			break;
+		int opcja;
+		while (cout << "Wybierz opcje: " && (!(cin >> opcja) || (opcja < 0 || opcja > 4))) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+		string nowaWartosc;
+
+		switch (opcja) {
+			case 1:
+				cout << "Podaj nowe imie: ";
+				cin >> nowaWartosc;
+				setImie(nowaWartosc);
+				cout << "Imie zostalo zmienione." << endl;
+				break;
+			case 2:
+				cout << "Podaj nowe nazwisko: ";
+				cin >> nowaWartosc;
+				setNazwisko(nowaWartosc);
+				cout << "Nazwisko zostalo zmienione." << endl;
+				break;
+			case 3:
+				cout << "Podaj nowy PESEL: ";
+				cin >> nowaWartosc;
+				setPesel(nowaWartosc);
+				cout << "PESEL zostal zmieniony." << endl;
+				break;
+			case 4:
+				cout << "Podaj nowe haslo: ";
+				cin >> nowaWartosc;
+				setHaslo(nowaWartosc);
+				cout << "Haslo zostalo zmienione." << endl;
+				break;
+			case 0:
+				cout << "Powrot do menu." << endl;
+				break;
+			default:
+				cout << "Niepoprawny wybor." << endl;
+				break;
 
 		}
 	}
@@ -1357,7 +1358,7 @@ public:
 				cout << "\n";
 			}
 		}
-				
+
 	}
 
 	/**
@@ -1407,7 +1408,7 @@ public:
 		}
 
 	}
-	
+
 };
 /**
  * @class FileManager
@@ -1577,7 +1578,7 @@ private:
 		j["numer"] = konto.getNumerKonta();
 		j["typ"] = konto.getTypKonta();
 		j["saldo"] = konto.getSaldoKonta();
-		
+
 
 		if (const KontoOszczednosciowe* oszcz = dynamic_cast<const KontoOszczednosciowe*>(&konto))
 		{
@@ -1688,7 +1689,7 @@ public:
 				{
 					cout << "Blad odczytu pliku: " << e.what() << endl;
 				}
-			
+
 			plik.close();
 		}
 		return klienci;
@@ -2012,7 +2013,7 @@ public:
 				if (czyPowiazana) break;
 			}
 			if (!czyPowiazana) delete karta; // Usuwamy karte
-			
+
 		}
 
 		for (auto konto : wszystkieKonta)
@@ -2510,7 +2511,7 @@ public:
 			menedzerPlikow.zapiszTransakcje(transakcje); // Zapisujemy zmiany do pliku
 			cout << "Przelew wykonany pomyslnie!" << endl;
 		}
-		
+
 	}
 	/**
 	 * @brief Wyświetla historię transakcji dla zalogowanego klienta.
@@ -2547,8 +2548,8 @@ public:
 	 *
 	 * Weryfikuje, czy podany login nie jest już używany przez
 	 * innego klienta w systemie.
-	 * 
-	 * @param login Login do sprawdzenia 
+	 *
+	 * @param login Login do sprawdzenia
 	 * @return true jeśli login istnieje, false w przeciwnym razie
 	 */
 	bool sprawdzCzyLoginIstnieje(const string& login)
