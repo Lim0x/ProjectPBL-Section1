@@ -2251,19 +2251,29 @@ public:
 	 */
 	void dodajKonto()
 	{
-		int typ;
-		string numerKonta = to_string(rand() % 1000000000 + 1); // 
-		float saldo;
+
+		string numerKonta = to_string(rand() % 1000000000 + 1); //
 
 		cout << "===== DODAWANIE KONTO =====" << endl;
 		cout << "Wybierz typ konta:" << endl;
 		cout << "1. Glowne" << endl;
 		cout << "2. Oszczednosciowe" << endl;
-		cout << "Wybierz opcje: ";
-		cin >> typ;
 
-		cout << "Podaj saldo poczatkowe: ";
-		cin >> saldo;
+		int typ;
+		while (cout << "Wybierz opcje: " && (!(cin >> typ) || !(typ == 1 || typ == 2))) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+		float saldo;
+		while (cout << "Podaj saldo poczatkowe: " && !(cin >> saldo)) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		if (typ == 1)
 		{
