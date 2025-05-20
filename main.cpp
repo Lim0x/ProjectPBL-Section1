@@ -2499,7 +2499,6 @@ public:
 
 			ostringstream ss;
 			ss << put_time(&today, "%m/%Y");
-			cout << ss.str();
 
 			Transakcja transakcja;
 			transakcja.setKwota(kwota);
