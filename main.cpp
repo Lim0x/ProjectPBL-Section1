@@ -247,7 +247,7 @@ public:
 	 *
 	 * @return Data oddania lokaty
 	 */
-	const string& getDataOddania() const { return dataOddania.substr(0, 2) + "/20"
+	string getDataOddania() const { return dataOddania.substr(0, 2) + "/20"
 		+ dataOddania.substr(2, 2); }
 
 	/**
@@ -2039,35 +2039,40 @@ public:
 	 * Główna metoda sterująca przepływem programu. Wyświetla menu główne
 	 * i obsługuje wybory użytkownika do moment wyjścia z programu.
 	 */
-	void uruchom()
-	{
-		int wybor;
-		do
-		{
+	void uruchom() {
+		bool stop = false;
+		do {
 			wyswietlMenuGlowne();
 			cout << "Wybierz opcje: ";
-			cin >> wybor;
 
-			switch (wybor)
-			{
-			case 1:
-				zarejestrujKlienta();
-				break;
-			case 2:
-				if (zalogujKlienta())
-				{
-					obslugaZalogowanegoUzytkownika();
-				}
-				break;
-			case 0:
-				cout << "Koniec programu." << endl;
-				break;
-			default:
+			int wybor;
+			if (!(cin >> wybor)) {
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 				cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
-				break;
+			} else {
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+				switch (wybor) {
+					case 1:
+						zarejestrujKlienta();
+						break;
+					case 2:
+						if (zalogujKlienta()) {
+							obslugaZalogowanegoUzytkownika();
+						}
+						break;
+					case 0:
+						cout << "Koniec programu." << endl;
+						stop = true;
+						break;
+					default:
+						cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+						break;
+				}
 			}
-		} while (wybor != 0);
-		
+
+		} while (!stop);
 	}
 	/**
 	 * @brief Wyświetla menu główne systemu bankowego.
@@ -2089,61 +2094,67 @@ public:
 	 * Wyświtla menu dla zalogowanego użytkownika i obsługuje
 	 * jego wybory do momentu wylogowania lub zakończenia programu.
 	 */
-	void obslugaZalogowanegoUzytkownika()
-	{
-		int wybor;
-		do
-		{
+	void obslugaZalogowanegoUzytkownika() {
+		bool stop = false;
+		do {
 			wyswietlMenuUzytkownika();
-			
-			cin >> wybor;
-			cin.ignore(); // Ignoruje znak nowej linii po wprowadzeniu liczby
 
-			switch (wybor)
-			{
-			case 1:
-				zalogowanyKlient->wyswietlDane();
-				break;
-			case 2:
-				zalogowanyKlient->edytujDane();
-				break;
-			case 3:
-				zalogowanyKlient->wyswietlKonta();
-				break;
-			case 4:
-				zalogowanyKlient->wyswietlKarty();
-				break;
-			case 5:
-				zalogowanyKlient->wyswietlLokaty();
-				break;
-			case 6:
-				dodajKonto();
-				break;
-			case 7:
-				dodajKarte();
-				break;
-			case 8:
-				zalozLokate();
-				break;
-			case 9:
-				wykonajPrzelew();
-				break;
-			case 10:
-				wyswietlHistorieTransakcji();
-				break;
-			case 0:
-				zalogowanyKlient = nullptr; // Wylogowanie
-				cout << "Wylogowano." << endl;
-				break;
-			default:
+			int wybor;
+
+			if (!(cin >> wybor)) {
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 				cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+			} else {
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+				switch (wybor) {
+					case 1:
+						zalogowanyKlient->wyswietlDane();
+						break;
+					case 2:
+						zalogowanyKlient->edytujDane();
+						break;
+					case 3:
+						zalogowanyKlient->wyswietlKonta();
+						break;
+					case 4:
+						zalogowanyKlient->wyswietlKarty();
+						break;
+					case 5:
+						zalogowanyKlient->wyswietlLokaty();
+						break;
+					case 6:
+						dodajKonto();
+						break;
+					case 7:
+						dodajKarte();
+						break;
+					case 8:
+						zalozLokate();
+						break;
+					case 9:
+						wykonajPrzelew();
+						break;
+					case 10:
+						wyswietlHistorieTransakcji();
+						break;
+					case 0:
+						zalogowanyKlient = nullptr; // Wylogowanie
+						cout << "Wylogowano." << endl;
+						stop = true;
+						break;
+					default:
+						cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+						continue;
+				}
+
+				if (wybor != 0) {
+					cout << "Nacisnij dowolny klawisz, aby kontynuowac..." << endl;
+					cin.get();
+				}
 			}
-			if (wybor !=0)
-			{
-				cout << "Nacisnij dowolny klawisz, aby kontynuowac..." << endl;
-				cin.get();
-			}
-		} while (wybor != 0);
+		} while (!stop);
 	}
 	/**
 	 * @brief Wyświetla menu dla zalogowanego użytkownika.
