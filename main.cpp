@@ -2392,8 +2392,6 @@ public:
 			return;
 		}
 
-		string dataOddania;
-
 		cout << "===== ZAKLADANIE LOKATY =====" << endl;
 		cout << "Wybierz konto do ktorego chcesz dodac lokate: " << endl;
 		for (size_t i = 0; i < zalogowanyKlient->getKontaUzytkownika().size(); ++i)
@@ -2427,6 +2425,7 @@ public:
 		}
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
+		string dataOddania;
 		cout << "Podaj date oddania lokaty: (MMRR) ";
 		cin >> dataOddania;
 
@@ -2464,32 +2463,34 @@ public:
 			return;
 		}
 
-		string numerKontaDocelowego;
-		float kwota;
-		int wyborKonta;
-
 		cout << "===== WYKONYWANIE PRZELEWU =====" << endl;
 		cout << "Wybierz konto z ktorego chcesz wykonac przelew: " << endl;
 		for (size_t i = 0; i < zalogowanyKlient->getKontaUzytkownika().size(); ++i)
 		{
 			cout << i + 1 << ". " << zalogowanyKlient->getKontaUzytkownika()[i]->getNumerKonta() << endl;
 		}
-		cout << "Wybierz opcje: ";
-		cin >> wyborKonta;
 
-		if (wyborKonta < 1 || wyborKonta > zalogowanyKlient->getKontaUzytkownika().size())
-		{
-			cout << "Niepoprawny wybor konta." << endl;
-			return;
+		int wyborKonta;
+		while (cout << "Wybierz opcje: " && (!(cin >> wyborKonta) || (wyborKonta < 1 || wyborKonta > zalogowanyKlient->getKontaUzytkownika().size()))) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
 		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		KontoGlowne* wybraneKonto = zalogowanyKlient->getKontaUzytkownika()[wyborKonta - 1];
 
+		string numerKontaDocelowego;
 		cout << "Podaj numer konta docelowego: ";
 		cin >> numerKontaDocelowego;
 
-		cout << "Podaj kwote przelewu: ";
-		cin >> kwota;
+		float kwota;
+		while (cout << "Podaj kwote przelewu: " && !(cin >> kwota)) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		if (wybraneKonto->wyplac(kwota))
 		{
