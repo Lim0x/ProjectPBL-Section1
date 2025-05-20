@@ -2307,7 +2307,7 @@ public:
 			string dataKapitalizacji = to_string(today.tm_mon + 1)
 			+ to_string((today.tm_year + 1900) % 100);
 
-			KontoOszczednosciowe* noweKonto = new KontoOszczednosciowe(numerKonta, saldo, oprocentowanie, dataKapitalizacji , limit);
+			KontoOszczednosciowe* noweKonto = new KontoOszczednosciowe(numerKonta, saldo, oprocentowanie, dataKapitalizacji, limit);
 			noweKonto->setWlascicielel(zalogowanyKlient->getPesel());
 			zalogowanyKlient->dodajKonto(noweKonto);
 			wszystkieKonta.push_back(noweKonto);
@@ -2492,10 +2492,18 @@ public:
 		}
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-		if (wybraneKonto->wyplac(kwota))
-		{
+		if (wybraneKonto->wyplac(kwota)) {
+			time_t now = time(nullptr);
+			tm today;
+			localtime_s(&today, &now);
+
+			ostringstream ss;
+			ss << put_time(&today, "%m/%Y");
+			cout << ss.str();
+
 			Transakcja transakcja;
 			transakcja.setKwota(kwota);
+			transakcja.setDataTransakcji(ss.str());
 			transakcja.setTypTransakcji("przelew");
 			transakcja.setKontoNadawcy(wybraneKonto->getNumerKonta());
 			transakcja.setKontoOdbiorcy(numerKontaDocelowego);
