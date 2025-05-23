@@ -14,6 +14,18 @@
 using namespace std;
 using json = nlohmann::json;
 
+/**
+ * @class Error
+ * @brief Odpowiada za wypisywanie wyjątków.
+ *
+ *
+ *	Odpowiada za wypisywanie wyjątków które wydarzyły się podczas działania programu
+ */
+class Error : public invalid_argument {
+public:
+	Error(const string& message) : invalid_argument(message) {}
+};
+
 
 /**
  * @class Karta
@@ -57,7 +69,13 @@ public:
 	 */
 	string getDataWaznosci() const
 	{
-		return dataWaznosci.substr(0, 2) + "/20" + dataWaznosci.substr(2, 2);
+		if (dataWaznosci.length() == 4) {
+			return dataWaznosci.substr(0, 2) + "/20" + dataWaznosci.substr(2, 2);
+		}
+		else
+		{
+			return dataWaznosci;
+		}
 	}
 	/**
 	 * @brief Zwraca kod CVC karty.
@@ -85,6 +103,10 @@ public:
 		else if (data.length()==7 && data[2] == '/') // Format "MM/YYYY"
 		{
 			dataWaznosci = data.substr(0, 2) + data.substr(5, 2);
+		}
+		else if (data.length() == 6)
+		{
+			dataWaznosci = data.substr(0, 2) + data.substr(4, 2);
 		}
 		else
 		{
@@ -1613,7 +1635,7 @@ private:
 			float oprocentowanie = j.at("oprocentowanie").get<float>();
 			string data = j.at("data_kapitalizacji").get<string>();
 			int limit = j.at("limit_wyplat").get<int>();
-			return new KontoOszczednosciowe(numer, saldo, oprocentowanie, data, limit);
+			noweKonto = new KontoOszczednosciowe(numer, saldo, oprocentowanie, data, limit);
 		}
 		else
 		{
@@ -2305,8 +2327,10 @@ public:
 			tm today;
 			localtime_s(&today, &now);
 
-			string dataKapitalizacji = to_string(today.tm_mon + 1)
-			+ to_string((today.tm_year + 1900) % 100);
+			ostringstream oss;
+			oss << setw(2) << setfill('0') << (today.tm_mon + 1);
+			oss << setw(2) << setfill('0') << ((today.tm_year + 1900) % 100);
+			string dataKapitalizacji = oss.str();
 
 			KontoOszczednosciowe* noweKonto = new KontoOszczednosciowe(numerKonta, saldo, oprocentowanie, dataKapitalizacji, limit);
 			noweKonto->setWlascicielel(zalogowanyKlient->getPesel());
@@ -2563,17 +2587,6 @@ public:
 		}
 		return false;
 	}
-};
-/**
- * @class Error
- * @brief Odpowiada za wypisywanie wyjątków.
- *
- *
- *	Odpowiada za wypisywanie wyjątków które wydarzyły się podczas działania programu
- */
-class Error : public invalid_argument {
-public:
-	Error(const string& message): invalid_argument(message) {}
 };
 int main(int argc, char** argv) {
 
