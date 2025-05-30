@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <exception>
 
+class SystemBankowy;
 using namespace std;
 using json = nlohmann::json;
 
@@ -152,6 +153,13 @@ public:
 	 */
 	virtual bool czyWazna() const
 	{
+		string dataWaznosci = getDataWaznosci();
+
+		if (dataWaznosci.length() == 7 && dataWaznosci[2] == '/')
+		{
+			dataWaznosci = dataWaznosci.substr(0, 2) + dataWaznosci.substr(5, 2); // Konwersja z formatu MM/YYYY na MMRR
+		}
+
 		if (dataWaznosci.length() != 4) {
 			return false; // Niepoprawny format daty
 		}
@@ -1010,6 +1018,7 @@ private:
 	string pesel; ///< Numer PESEL klienta
 	string login; ///< Login klienta
 	string haslo; ///< Haslo klienta
+	
 
 	vector<KontoGlowne*> kontaUzytkownika; ///< Tablica przechowujaca konta uzytkownika
 	vector<Karta*> kartyUzytkownika; ///< Tablica przechowujaca karty uzytkownika
@@ -1281,63 +1290,13 @@ public:
 		return false; // Konto nie znalezione
 	}
     /**
-     * @brief Edytuje dane klienta.
+	 * @brief Deklaracja funkcji edytujDane.
      *
      * Funkcja umozliwia edycje danych klienta, takich jak imie, nazwisko, czy PESEL,
      * zapisujac zmiany do pliku JSON.
      */
-    void edytujDane() {
-		cout << "===== EDYCJA DANYCH =====" << endl;
-		cout << "1. Imie" << endl;
-		cout << "2. Nazwisko" << endl;
-		cout << "3. PESEL" << endl;
-		cout << "4. Haslo" << endl;
-		cout << "0. Powrot" << endl;
+	void edytujDane(SystemBankowy* systemBankowy);
 
-		int opcja;
-		while (cout << "Wybierz opcje: " && (!(cin >> opcja) || (opcja < 0 || opcja > 4))) {
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
-		}
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-		string nowaWartosc;
-
-		switch (opcja) {
-			case 1:
-				cout << "Podaj nowe imie: ";
-				cin >> nowaWartosc;
-				setImie(nowaWartosc);
-				cout << "Imie zostalo zmienione." << endl;
-				break;
-			case 2:
-				cout << "Podaj nowe nazwisko: ";
-				cin >> nowaWartosc;
-				setNazwisko(nowaWartosc);
-				cout << "Nazwisko zostalo zmienione." << endl;
-				break;
-			case 3:
-				cout << "Podaj nowy PESEL: ";
-				cin >> nowaWartosc;
-				setPesel(nowaWartosc);
-				cout << "PESEL zostal zmieniony." << endl;
-				break;
-			case 4:
-				cout << "Podaj nowe haslo: ";
-				cin >> nowaWartosc;
-				setHaslo(nowaWartosc);
-				cout << "Haslo zostalo zmienione." << endl;
-				break;
-			case 0:
-				cout << "Powrot do menu." << endl;
-				break;
-			default:
-				cout << "Niepoprawny wybor." << endl;
-				break;
-
-		}
-	}
 	/**
 	 * @brief Wyswietla dane klienta.
 	 *
@@ -2136,7 +2095,7 @@ public:
 						zalogowanyKlient->wyswietlDane();
 						break;
 					case 2:
-						zalogowanyKlient->edytujDane();
+						zalogowanyKlient->edytujDane(this);
 						break;
 					case 3:
 						zalogowanyKlient->wyswietlKonta();
@@ -2265,6 +2224,17 @@ public:
 
 		cout << "Niepoprawny login lub haslo." << endl;
 		return false;
+	}
+
+	/**
+	 * @brief Zapisywanie (edytowanych) danych klientów do pliku.
+	 * 
+	 * 
+	 */
+	void zapiszDaneKlientow()
+	{
+		menedzerPlikow.zapiszKlientow(klienci); // Zapisujemy zmiany do pliku
+		menedzerPlikow.zapiszKonta(wszystkieKonta); // Zapisujemy konta
 	}
 	/**
 	 * @brief Dodaje nowe konto dla zalogowanego klienta.
@@ -2588,6 +2558,74 @@ public:
 		return false;
 	}
 };
+
+/**
+ * @brief Edytuje dane klienta.
+ *
+ * Funkcja umozliwia edycje danych klienta, takich jak imie, nazwisko, czy PESEL,
+ * zapisujac zmiany do pliku JSON.
+ */
+void Klient:: edytujDane(SystemBankowy* systemBankowy) {
+	cout << "===== EDYCJA DANYCH =====" << endl;
+	cout << "1. Imie" << endl;
+	cout << "2. Nazwisko" << endl;
+	cout << "3. PESEL" << endl;
+	cout << "4. Haslo" << endl;
+	cout << "0. Powrot" << endl;
+
+	int opcja;
+	while (cout << "Wybierz opcje: " && (!(cin >> opcja) || (opcja < 0 || opcja > 4))) {
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+	}
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+	string nowaWartosc;
+
+	switch (opcja) {
+	case 1:
+		cout << "Podaj nowe imie: ";
+		cin >> nowaWartosc;
+		setImie(nowaWartosc);
+		cout << "Imie zostalo zmienione." << endl;
+		break;
+	case 2:
+		cout << "Podaj nowe nazwisko: ";
+		cin >> nowaWartosc;
+		setNazwisko(nowaWartosc);
+		cout << "Nazwisko zostalo zmienione." << endl;
+		break;
+	case 3:
+		cout << "Podaj nowy PESEL: ";
+		cin >> nowaWartosc;
+		setPesel(nowaWartosc);
+		for (auto& konto : kontaUzytkownika)
+		{
+			konto->setWlascicielel(nowaWartosc); // Aktualizujemy PESEL we wszystkich kontach
+		}
+		cout << "PESEL zostal zmieniony." << endl;
+		break;
+	case 4:
+		cout << "Podaj nowe haslo: ";
+		cin >> nowaWartosc;
+		setHaslo(nowaWartosc);
+		cout << "Haslo zostalo zmienione." << endl;
+		break;
+	case 0:
+		cout << "Powrot do menu." << endl;
+		break;
+	default:
+		cout << "Niepoprawny wybor." << endl;
+		break;
+
+	}
+
+	if (systemBankowy)
+	{
+		systemBankowy->zapiszDaneKlientow();
+	}
+}
 int main(int argc, char** argv) {
 
 	srand(static_cast<unsigned int>(time(nullptr)));
