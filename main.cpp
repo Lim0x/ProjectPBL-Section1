@@ -2056,6 +2056,101 @@ public:
 
 		} while (!stop);
 	}
+
+	/**
+	 * @brief Usuwa wybrane konto klienta wraz z powiązanymi kartami i lokatami.
+	 *
+	 * Funkcja ta umożliwia zalogowanemu klientowi usunięcie jednego ze swoich kont bankowych.
+	 */
+	void usunKonto()
+	{
+
+		auto& konta = zalogowanyKlient->getKontaUzytkownika();
+		for (size_t i = 0; i < konta.size(); ++i) {
+			cout << i + 1 << ". " << konta[i]->getNumerKonta() << " (" << konta[i]->getTypKonta() << ")" << endl;
+		}
+		cout << "Wybierz numer konta do usuniecia: ";
+		int wybor;
+		cin >> wybor;
+
+		if (wybor > 0 && wybor <= konta.size()) {
+			string numer = konta[wybor - 1]->getNumerKonta();
+
+		
+			
+
+			auto& lokaty = zalogowanyKlient->getLokatyUzytkownika();
+			for (auto it = lokaty.begin(); it != lokaty.end(); ) {
+				if (it->getPowiazaneKonto() == numer) {
+					it = lokaty.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+
+			
+			auto& karty = zalogowanyKlient->getKartyUzytkownika();
+			for (auto it = karty.begin(); it != karty.end(); ) {
+				KartaDebetowa* karta = dynamic_cast<KartaDebetowa*>(*it);
+				if (karta && karta->getPowiazaneKonto() == numer) {
+					it = karty.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+
+
+			
+			for (auto it = wszystkieKonta.begin(); it != wszystkieKonta.end(); ++it) {
+				if ((*it)->getNumerKonta() == numer) {
+					wszystkieKonta.erase(it); 
+					break;
+				}
+
+			}
+
+			if (zalogowanyKlient->usunKonto(numer)) {
+				cout << "Konto oraz powiązane karty i lokaty zostaly usuniete." << endl;
+
+				menedzerPlikow.zapiszKonta(wszystkieKonta);
+				menedzerPlikow.zapiszKarty(zalogowanyKlient->getKartyUzytkownika());
+				menedzerPlikow.zapiszLokaty(zalogowanyKlient->getLokatyUzytkownika());
+			}
+			else {
+				cout << "Nie znaleziono konta." << endl;
+			}
+		}
+	}
+
+	/**
+	 * @brief Usuwa wybrana karte klienta.
+	 *
+	 * Funkcja ta umożliwia zalogowanemu klientowi usunięcie jednej ze swoich kart bankowych.
+	 */
+	void usunKarte()
+	{
+		auto& karty = zalogowanyKlient->getKartyUzytkownika();
+		for (size_t i = 0; i < karty.size(); ++i) {
+			cout << i + 1 << ". " << karty[i]->getNumerKarty() << " (" << karty[i]->getTypKarty() << ")" << endl;
+		}
+		cout << "Wybierz numer karty do usuniecia: ";
+		int wybor;
+		cin >> wybor;
+		if (wybor > 0 && wybor <= karty.size()) {
+			string numer = karty[wybor - 1]->getNumerKarty();
+			if (zalogowanyKlient->usunKarte(numer)) {
+				cout << "Karta zostala usunieta." << endl;
+				menedzerPlikow.zapiszKarty(zalogowanyKlient->getKartyUzytkownika());
+			}
+			else {
+				cout << "Nie znaleziono karty." << endl;
+			}
+		}
+	}
+
+	
 	/**
 	 * @brief Wyświetla menu główne systemu bankowego.
 	 *
@@ -2121,6 +2216,31 @@ public:
 					case 10:
 						wyswietlHistorieTransakcji();
 						break;
+					case 11:
+						cout << "Uwaga! Usuniecie konta spowoduje usuniecie wszystkich powiazanych kart i lokat." << endl;
+						cout << "Wpisz 1 zeby przejsc dalej, lub 0 zeby anulowac wybor" << endl;
+						
+					do{
+						int wybor = -1;
+						cin >> wybor;
+					if (wybor == 1)
+					{
+						usunKonto();
+						break;
+					} else if (wybor == 0)
+					{
+						wyswietlMenuUzytkownika();
+						break;
+					}else
+					{
+						cout << "Niepoprawny wybor. Sprobuj ponownie." << endl;
+					}
+					} while (wybor != 1 && wybor != 0);
+					break;
+
+					case 12:
+						usunKarte();
+						break;
 					case 0:
 						zalogowanyKlient = nullptr; // Wylogowanie
 						cout << "Wylogowano." << endl;
@@ -2157,6 +2277,14 @@ public:
 		cout << "8. Zaloz lokate" << endl;
 		cout << "9. Wykonaj przelew" << endl;
 		cout << "10. Wyswietl historie transakcji" << endl;
+		if (zalogowanyKlient->getKontaUzytkownika().size() > 0)
+		{
+			cout << "11. Usun konto" << endl;
+		}
+		if (zalogowanyKlient->getKartyUzytkownika().size() > 0)
+		{
+			cout << "12. Usun karte" << endl;
+		}
 		cout << "0. Wyloguj" << endl;
 		cout << "Wybierz opcje: ";
 	}
