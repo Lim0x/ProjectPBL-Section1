@@ -10,6 +10,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <exception>
+#include <conio.h>
 
 class SystemBankowy;
 using namespace std;
@@ -131,7 +132,7 @@ public:
 			pin = nowyPin;
 		}
 		else {
-			throw Error("PIN musi mieć 4 cyfry");
+			throw Error(", PIN musi miec 4 cyfry");
 		}
 	}
 	/**
@@ -2299,8 +2300,25 @@ public:
 		string imie, nazwisko, pesel, login, haslo;
 
 		cout << "===== REJESTRACJA =====" << endl;
-		cout << "Podaj imie: ";
-		cin >> imie;
+		cout << "Podaj imie (ESC aby anulowac): ";
+		char znak;
+		while (true)
+		{
+			znak = _getch();
+			if (znak == 27)//ESC
+			{
+				cout << "Rejestracja anulowana.\n";
+				return;
+			} else if (znak =='\r')//Enter
+			{
+				cout << endl;
+				break;
+			} else
+			{
+				imie += znak;
+				cout << znak;
+			}
+		}
 		cout << "Podaj nazwisko: ";
 		cin >> nazwisko;
 		cout << "Podaj PESEL: ";
@@ -2554,7 +2572,7 @@ public:
 
 		if (wybraneKonto->getSaldoKonta() < kwota)
 		{
-			cout << "Nie masz wystarczających środków na koncie." << endl;
+			cout << "Nie masz wystarczajacych srodków na koncie." << endl;
 			return;
 		}
 
