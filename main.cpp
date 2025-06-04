@@ -470,7 +470,7 @@ public:
 			return false;
 		}
 		saldoKonta -= kwota;
-		cout << "Wyplata zakonczona sukcesem. Nowe saldo: " << saldoKonta << " PLN" << endl;
+		cout << "Wyplata zakonczona sukcesem. Nowe saldo: " <<fixed<<setprecision(2)<<saldoKonta<< " PLN" << endl;
 		return true;
 
 	}
